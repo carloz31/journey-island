@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Progress } from '@/components/ui/progress';
+import { Trophy, Star } from 'lucide-react';
 import { StudentData } from '@/data/mockData';
 
 interface WelcomeOverlayProps {
@@ -8,6 +8,9 @@ interface WelcomeOverlayProps {
 }
 
 const WelcomeOverlay = ({ student }: WelcomeOverlayProps) => {
+  const counselorPct = student.counselorProgress;
+  const progressPct = student.platformProgress;
+
   return (
     <motion.div
       className="absolute top-4 left-4 z-20 glass-panel p-4 w-72"
@@ -27,20 +30,44 @@ const WelcomeOverlay = ({ student }: WelcomeOverlayProps) => {
         </div>
       </div>
 
-      <div className="space-y-2">
-        <div>
-          <div className="flex justify-between text-xs mb-1">
-            <span className="text-muted-foreground">Plan orientador</span>
-            <span className="text-primary font-semibold">{student.counselorProgress}%</span>
-          </div>
-          <Progress value={student.counselorProgress} className="h-1.5" />
+      {/* Unified progress bar */}
+      <div className="mb-3">
+        <div className="flex justify-between text-xs mb-1">
+          <span className="text-muted-foreground">Progreso total</span>
+          <span className="text-primary font-semibold">{progressPct}%</span>
         </div>
-        <div>
-          <div className="flex justify-between text-xs mb-1">
-            <span className="text-muted-foreground">Plataforma total</span>
-            <span className="text-secondary font-semibold">{student.platformProgress}%</span>
-          </div>
-          <Progress value={student.platformProgress} className="h-1.5" />
+        <div className="relative w-full h-2.5 rounded-full bg-muted overflow-hidden">
+          {/* Progress fill */}
+          <div
+            className="absolute inset-y-0 left-0 rounded-full bg-primary transition-all"
+            style={{ width: `${progressPct}%` }}
+          />
+          {/* Counselor threshold marker */}
+          <div
+            className="absolute top-0 h-full w-0.5 bg-accent z-10"
+            style={{ left: `${counselorPct}%` }}
+          />
+          <div
+            className="absolute -top-0.5 w-2 h-[calc(100%+4px)] rounded-sm bg-accent/80"
+            style={{ left: `calc(${counselorPct}% - 3px)` }}
+          />
+        </div>
+        <p className="text-[10px] text-muted-foreground mt-1">
+          Meta del orientador: {counselorPct}% <span className="text-accent">▼</span>
+        </p>
+      </div>
+
+      {/* Achievements row */}
+      <div className="flex items-center gap-4 pt-2 border-t border-border/30">
+        <div className="flex items-center gap-1.5">
+          <Trophy className="w-3.5 h-3.5 text-primary" />
+          <span className="text-xs font-semibold text-foreground">{student.totalBadges}</span>
+          <span className="text-[10px] text-muted-foreground">insignias</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Star className="w-3.5 h-3.5 text-primary" />
+          <span className="text-xs font-semibold text-foreground">{student.totalPoints}</span>
+          <span className="text-[10px] text-muted-foreground">puntos</span>
         </div>
       </div>
     </motion.div>
