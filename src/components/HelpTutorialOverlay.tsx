@@ -57,7 +57,7 @@ const HelpTutorialOverlay = ({ open, onClose }: HelpTutorialOverlayProps) => {
             exit={{ y: 50, opacity: 0 }}
             transition={{ delay: 0.15 }}
           >
-            <div className="w-28 h-28 rounded-full bg-gradient-to-br from-amber-700 to-amber-900 border-4 border-primary/40 flex items-center justify-center shadow-lg shadow-primary/20">
+            <div className="w-28 h-28 rounded-full bg-gradient-to-br from-primary/70 to-primary/30 border-4 border-primary/40 flex items-center justify-center shadow-lg shadow-primary/20">
               <span className="text-5xl">🐒</span>
             </div>
             <div className="text-center mt-1">
