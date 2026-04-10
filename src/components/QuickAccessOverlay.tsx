@@ -22,7 +22,7 @@ const QuickAccessOverlay = () => {
         {quickLinks.map((link) => (
           <button
             key={link.label}
-            className="glass-panel px-3 py-2 flex items-center gap-2 hover:bg-muted/50 transition-colors cursor-pointer"
+            className="glass-panel px-3 py-2 flex items-center gap-2 hover:bg-muted/60 transition-colors cursor-pointer"
           >
             <link.icon className="w-4 h-4 text-primary" />
             <span className="text-xs font-body font-semibold text-foreground">{link.label}</span>
@@ -47,13 +47,13 @@ const QuickAccessOverlay = () => {
           {availableActivities.slice(0, 3).map((act) => (
             <div
               key={act.id}
-              className="flex items-center justify-between py-1.5 border-b border-border/30 last:border-0"
+              className="flex items-center justify-between py-1.5 border-b border-border last:border-0"
             >
               <div>
                 <p className="text-xs font-semibold text-foreground">{act.title}</p>
                 <p className="text-[10px] text-muted-foreground">{act.region} · {act.type}</p>
               </div>
-              <div className="w-2 h-2 rounded-full bg-glow-teal animate-pulse-glow" />
+              <div className="w-2 h-2 rounded-full bg-primary animate-pulse-glow" />
             </div>
           ))}
         </div>

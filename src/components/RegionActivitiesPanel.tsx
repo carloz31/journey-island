@@ -57,7 +57,7 @@ const ActivityCard = ({ activity, direction }: { activity: Activity; direction: 
     <h3 className="font-display text-lg font-bold text-foreground mb-2">{activity.title}</h3>
     <p className="text-sm text-muted-foreground flex-1">{activity.description}</p>
     {activity.status === 'locked' && activity.lockedReason && (
-      <p className="text-xs text-accent mt-2 flex items-center gap-1">
+      <p className="text-xs text-warning mt-2 flex items-center gap-1">
         <Lock className="w-3 h-3" />
         {activity.lockedReason}
       </p>
@@ -88,7 +88,7 @@ const RegionActivitiesPanel = ({ region, open, onClose }: RegionActivitiesPanelP
     <Sheet open={open} onOpenChange={(o) => { if (!o) { onClose(); setCurrentIndex(0); } }}>
       <SheetContent
         side="bottom"
-        className="bg-card/90 backdrop-blur-xl border-t border-border/50 max-h-[50vh] rounded-t-2xl"
+        className="bg-card/95 backdrop-blur-xl border-t border-border max-h-[50vh] rounded-t-2xl"
       >
         <SheetHeader className="mb-4">
           <SheetTitle className="font-display text-xl">

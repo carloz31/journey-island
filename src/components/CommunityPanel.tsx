@@ -27,13 +27,13 @@ const CommunityPanel = ({ open, onClose }: CommunityPanelProps) => {
     <AnimatePresence>
       {open && (
         <motion.div
-          className="absolute top-16 right-4 z-30 glass-panel w-80 max-h-[75vh] flex flex-col"
+          className="absolute top-16 left-1/2 -translate-x-1/2 z-30 glass-panel w-80 max-h-[75vh] flex flex-col"
           initial={{ opacity: 0, y: -10, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -10, scale: 0.95 }}
           transition={{ duration: 0.2 }}
         >
-          <div className="flex items-center justify-between p-4 border-b border-border/30">
+          <div className="flex items-center justify-between p-4 border-b border-border">
             <h3 className="font-display font-bold text-sm text-foreground">Comunidad</h3>
             <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
               <X className="w-4 h-4" />
@@ -41,7 +41,7 @@ const CommunityPanel = ({ open, onClose }: CommunityPanelProps) => {
           </div>
 
           {/* Tabs */}
-          <div className="flex border-b border-border/30">
+          <div className="flex border-b border-border">
             {tabs.map(t => (
               <button
                 key={t.key}
@@ -57,9 +57,9 @@ const CommunityPanel = ({ open, onClose }: CommunityPanelProps) => {
             {tab === 'classmates' && (
               <div className="space-y-2">
                 {classmatesData.map(c => (
-                  <div key={c.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/30 transition-colors">
+                  <div key={c.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
                     <Avatar className="w-8 h-8">
-                      <AvatarFallback className="bg-secondary/20 text-secondary text-xs font-bold">{c.avatar}</AvatarFallback>
+                      <AvatarFallback className="bg-primary/15 text-primary text-xs font-bold">{c.avatar}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-semibold text-foreground truncate">{c.name}</p>
@@ -73,8 +73,8 @@ const CommunityPanel = ({ open, onClose }: CommunityPanelProps) => {
             {tab === 'ranking' && (
               <div className="space-y-2">
                 {sorted.map((c, i) => (
-                  <div key={c.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/30 transition-colors">
-                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${i < 3 ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                  <div key={c.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${i < 3 ? 'bg-accent/20 text-accent-foreground' : 'bg-muted text-muted-foreground'}`}>
                       {i + 1}
                     </span>
                     <div className="flex-1 min-w-0">
@@ -92,11 +92,11 @@ const CommunityPanel = ({ open, onClose }: CommunityPanelProps) => {
                 {badgesData.map(b => (
                   <div
                     key={b.id}
-                    className={`p-3 rounded-lg text-center transition-colors ${b.earned ? 'bg-primary/10' : 'bg-muted/30 opacity-40'}`}
+                    className={`p-3 rounded-lg text-center transition-colors ${b.earned ? 'bg-accent/10' : 'bg-muted/50 opacity-40'}`}
                   >
                     <span className="text-2xl block mb-1">{b.icon}</span>
                     <p className="text-[10px] font-semibold text-foreground">{b.name}</p>
-                    {b.earned && <Trophy className="w-3 h-3 text-primary mx-auto mt-1" />}
+                    {b.earned && <Trophy className="w-3 h-3 text-accent mx-auto mt-1" />}
                   </div>
                 ))}
               </div>

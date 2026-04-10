@@ -20,7 +20,7 @@ const WelcomeOverlay = ({ student }: WelcomeOverlayProps) => {
     >
       <div className="flex items-center gap-3 mb-3">
         <Avatar className="w-10 h-10 border-2 border-primary">
-          <AvatarFallback className="bg-primary/20 text-primary font-display font-bold text-sm">
+          <AvatarFallback className="bg-primary/15 text-primary font-display font-bold text-sm">
             {student.name.split(' ').map(n => n[0]).join('')}
           </AvatarFallback>
         </Avatar>
@@ -36,7 +36,7 @@ const WelcomeOverlay = ({ student }: WelcomeOverlayProps) => {
           <span className="text-muted-foreground">Progreso total</span>
           <span className="text-primary font-semibold">{progressPct}%</span>
         </div>
-        <div className="relative w-full h-2.5 rounded-full bg-muted overflow-hidden">
+        <div className="relative w-full h-3 rounded-full bg-muted overflow-hidden">
           {/* Progress fill */}
           <div
             className="absolute inset-y-0 left-0 rounded-full bg-primary transition-all"
@@ -48,24 +48,24 @@ const WelcomeOverlay = ({ student }: WelcomeOverlayProps) => {
             style={{ left: `${counselorPct}%` }}
           />
           <div
-            className="absolute -top-0.5 w-2 h-[calc(100%+4px)] rounded-sm bg-accent/80"
+            className="absolute -top-0.5 w-2 h-[calc(100%+4px)] rounded-sm bg-accent"
             style={{ left: `calc(${counselorPct}% - 3px)` }}
           />
         </div>
         <p className="text-[10px] text-muted-foreground mt-1">
-          Meta del orientador: {counselorPct}% <span className="text-accent">▼</span>
+          Meta del orientador: {counselorPct}% <span className="text-accent font-bold">▼</span>
         </p>
       </div>
 
       {/* Achievements row */}
-      <div className="flex items-center gap-4 pt-2 border-t border-border/30">
+      <div className="flex items-center gap-4 pt-2 border-t border-border">
         <div className="flex items-center gap-1.5">
-          <Trophy className="w-3.5 h-3.5 text-primary" />
+          <Trophy className="w-3.5 h-3.5 text-accent" />
           <span className="text-xs font-semibold text-foreground">{student.totalBadges}</span>
           <span className="text-[10px] text-muted-foreground">insignias</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <Star className="w-3.5 h-3.5 text-primary" />
+          <Star className="w-3.5 h-3.5 text-accent" />
           <span className="text-xs font-semibold text-foreground">{student.totalPoints}</span>
           <span className="text-[10px] text-muted-foreground">puntos</span>
         </div>
