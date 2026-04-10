@@ -1,5 +1,7 @@
 import { useState, useRef, useCallback, useMemo } from 'react';
 import { regions, Region } from '@/data/mockData';
+import { Plus, Minus, Locate } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
 
 interface MapSceneProps {
   onRegionClick: (region: Region) => void;
