@@ -18,7 +18,7 @@ const MapControls = ({ onLeaderboardClick, onHelpClick }: MapControlsProps) => {
 
   return (
     <motion.div
-      className="absolute top-3 right-3 z-20 flex flex-col gap-2"
+      className="absolute top-3 right-3 z-20 flex flex-row gap-2"
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.5 }}

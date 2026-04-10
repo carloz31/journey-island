@@ -229,42 +229,18 @@ const MapScene = ({ onRegionClick }: MapSceneProps) => {
       </svg>
 
       {/* Zoom controls - bottom right */}
-      <div className="absolute bottom-4 right-4 z-20 flex flex-col items-center gap-1.5 glass-panel p-1.5 rounded-xl">
-        <button
-          onClick={zoomIn}
-          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-muted/60 transition-colors text-foreground"
-          title="Zoom in"
-        >
-          <Plus className="w-4 h-4" />
-        </button>
-
-        <div className="h-24 flex items-center py-1">
-          <Slider
-            orientation="vertical"
-            value={[zoomSliderValue]}
-            onValueChange={([v]) => applyZoom(v)}
-            min={0}
-            max={100}
-            step={1}
-            className="h-full"
-          />
-        </div>
-
-        <button
-          onClick={zoomOut}
-          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-muted/60 transition-colors text-foreground"
-          title="Zoom out"
-        >
+      <div className="absolute bottom-4 right-4 z-20 flex items-center gap-1.5 glass-panel p-1.5 rounded-xl">
+        <button onClick={zoomOut} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-muted/60 transition-colors text-foreground" title="Zoom out">
           <Minus className="w-4 h-4" />
         </button>
-
-        <div className="w-full border-t border-border my-0.5" />
-
-        <button
-          onClick={resetView}
-          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-muted/60 transition-colors text-foreground"
-          title="Reset view"
-        >
+        <div className="w-24 flex items-center px-1">
+          <Slider value={[zoomSliderValue]} onValueChange={([v]) => applyZoom(v)} min={0} max={100} step={1} />
+        </div>
+        <button onClick={zoomIn} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-muted/60 transition-colors text-foreground" title="Zoom in">
+          <Plus className="w-4 h-4" />
+        </button>
+        <div className="h-6 border-l border-border mx-0.5" />
+        <button onClick={resetView} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-muted/60 transition-colors text-foreground" title="Reset view">
           <Locate className="w-4 h-4" />
         </button>
       </div>
