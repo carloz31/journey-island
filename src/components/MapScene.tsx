@@ -106,12 +106,11 @@ const MapScene = () => {
   // Stepping-stone paths between connected islands
   const connections: [string, string][] = [
     ['self-knowledge', 'exploration'],
-    ['self-knowledge', 'skills'],
+    ['skills', 'self-knowledge'],
     ['self-knowledge', 'parents'],
-    ['exploration', 'decision'],
-    ['skills', 'decision'],
+    ['exploration', 'future'],
     ['decision', 'projects'],
-    ['projects', 'future'],
+    ['decision', 'future'],
   ];
 
   const regionMap = Object.fromEntries(regions.map(r => [r.id, r]));

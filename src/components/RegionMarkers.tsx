@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Lock, Sparkles, Loader2, CheckCircle2, Users } from 'lucide-react';
+import { Lock, Sparkles, CheckCircle2, Users } from 'lucide-react';
 import { Region, RegionStatus } from '@/data/mockData';
 
 interface RegionMarkersProps {
@@ -10,7 +10,6 @@ interface RegionMarkersProps {
 const statusConfig: Record<RegionStatus, { icon: typeof Lock; ringColor: string; bgColor: string; textColor: string }> = {
   locked:      { icon: Lock,         ringColor: 'border-inactive',  bgColor: 'bg-muted',         textColor: 'text-inactive' },
   available:   { icon: Sparkles,     ringColor: 'border-primary',   bgColor: 'bg-primary/10',    textColor: 'text-primary' },
-  in_progress: { icon: Loader2,      ringColor: 'border-primary',   bgColor: 'bg-primary/15',    textColor: 'text-primary' },
   restored:    { icon: CheckCircle2, ringColor: 'border-success',   bgColor: 'bg-success/15',    textColor: 'text-success' },
 };
 
@@ -20,7 +19,7 @@ const RegionMarkers = ({ regions, onRegionClick }: RegionMarkersProps) => {
       {regions.map((region, idx) => {
         const config = statusConfig[region.status];
         const Icon = region.isParentBlock ? Users : config.icon;
-        const isActive = region.status === 'restored' || region.status === 'in_progress';
+        const isActive = region.status === 'restored';
         const isClickable = region.status !== 'locked';
 
         return (
@@ -29,7 +28,7 @@ const RegionMarkers = ({ regions, onRegionClick }: RegionMarkersProps) => {
             className="absolute pointer-events-auto"
             style={{
               left: `${region.position.x}%`,
-              top: `${region.position.y}%`,
+              top: `${(region.position.y / 70) * 100}%`,
               transform: 'translate(-50%, -50%)',
             }}
             initial={{ opacity: 0, scale: 0 }}
@@ -46,34 +45,34 @@ const RegionMarkers = ({ regions, onRegionClick }: RegionMarkersProps) => {
               whileHover={isClickable ? { scale: 1.1 } : {}}
               whileTap={isClickable ? { scale: 0.95 } : {}}
             >
-              {/* Glow ring for active */}
-              {isActive && (
-                <motion.div
-                  className={`absolute rounded-full ${config.ringColor} border-2`}
-                  style={{ width: 56, height: 56, left: -6, top: -6 }}
-                  animate={{ opacity: [0.3, 0.7, 0.3] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
-              )}
+              {/* wrapper solo del icono */}
+              <div className="relative w-11 h-11">
+                {isActive && (
+                  <motion.div
+                    className={`absolute inset-0 rounded-full ${config.ringColor} border-2`}
+                    style={{
+                      width: 56,
+                      height: 56,
+                      left: -6,
+                      top: -6,
+                    }}
+                    animate={{ opacity: [0.3, 0.7, 0.3] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                )}
 
-              {/* Marker circle */}
-              <div
-                className={`
-                  w-11 h-11 rounded-full flex items-center justify-center
-                  border-2 ${config.ringColor} ${config.bgColor}
-                  shadow-md transition-all duration-300 bg-card
-                  ${isClickable ? 'group-hover:shadow-lg' : 'opacity-50'}
-                `}
-              >
-                <Icon
-                  className={`w-4.5 h-4.5 ${config.textColor} ${
-                    region.status === 'in_progress' ? 'animate-spin' : ''
-                  }`}
-                  style={region.status === 'in_progress' ? { animationDuration: '3s' } : {}}
-                />
+                <div
+                  className={`
+                    w-11 h-11 rounded-full flex items-center justify-center
+                    border-2 ${config.ringColor} ${config.bgColor}
+                    shadow-md transition-all duration-300 bg-card
+                    ${isClickable ? 'group-hover:shadow-lg' : 'opacity-50'}
+                  `}
+                >
+                  <Icon className={`w-5 h-5 ${config.textColor}`} />
+                </div>
               </div>
 
-              {/* Label */}
               <div className="glass-panel px-3 py-1 text-center min-w-max shadow-sm">
                 <p className="text-xs font-display font-semibold text-foreground leading-tight">
                   {region.name}
