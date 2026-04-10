@@ -46,8 +46,8 @@ const HelpTutorialOverlay = ({ open, onClose }: HelpTutorialOverlayProps) => {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          {/* Darkened backdrop */}
-          <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" onClick={handleClose} />
+          {/* Semi-transparent backdrop */}
+          <div className="absolute inset-0 bg-foreground/30 backdrop-blur-sm" onClick={handleClose} />
 
           {/* Pepe character */}
           <motion.div
@@ -57,11 +57,11 @@ const HelpTutorialOverlay = ({ open, onClose }: HelpTutorialOverlayProps) => {
             exit={{ y: 50, opacity: 0 }}
             transition={{ delay: 0.15 }}
           >
-            <div className="w-28 h-28 rounded-full bg-gradient-to-br from-primary/70 to-primary/30 border-4 border-primary/40 flex items-center justify-center shadow-lg shadow-primary/20">
+            <div className="w-28 h-28 rounded-full bg-gradient-to-br from-accent/70 to-accent/30 border-4 border-accent/40 flex items-center justify-center shadow-lg">
               <span className="text-5xl">🐒</span>
             </div>
             <div className="text-center mt-1">
-              <span className="text-xs font-display font-bold text-primary">Pepe</span>
+              <span className="text-xs font-display font-bold text-accent-foreground">Pepe</span>
             </div>
           </motion.div>
 
@@ -73,7 +73,7 @@ const HelpTutorialOverlay = ({ open, onClose }: HelpTutorialOverlayProps) => {
             exit={{ y: 30, opacity: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <div className="glass-panel p-6 border-2 border-primary/30 shadow-lg shadow-primary/10">
+            <div className="glass-panel p-6 border-2 border-primary/30 shadow-lg">
               {/* Close button */}
               <button
                 onClick={handleClose}

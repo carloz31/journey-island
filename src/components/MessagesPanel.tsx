@@ -12,13 +12,13 @@ const MessagesPanel = ({ open, onClose }: MessagesPanelProps) => {
     <AnimatePresence>
       {open && (
         <motion.div
-          className="absolute top-16 right-4 z-30 glass-panel w-80 max-h-[70vh] flex flex-col"
+          className="absolute top-16 left-1/2 -translate-x-1/2 z-30 glass-panel w-80 max-h-[70vh] flex flex-col"
           initial={{ opacity: 0, y: -10, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -10, scale: 0.95 }}
           transition={{ duration: 0.2 }}
         >
-          <div className="flex items-center justify-between p-4 border-b border-border/30">
+          <div className="flex items-center justify-between p-4 border-b border-border">
             <h3 className="font-display font-bold text-sm text-foreground">Mensajes</h3>
             <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
               <X className="w-4 h-4" />
@@ -28,12 +28,12 @@ const MessagesPanel = ({ open, onClose }: MessagesPanelProps) => {
             {messagesData.map((msg) => (
               <div
                 key={msg.id}
-                className={`p-3 rounded-lg cursor-pointer transition-colors hover:bg-muted/50 ${msg.unread ? 'bg-primary/5' : ''}`}
+                className={`p-3 rounded-lg cursor-pointer transition-colors hover:bg-muted/60 ${msg.unread ? 'bg-primary/5' : ''}`}
               >
                 <div className="flex items-start gap-2.5">
-                  <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${msg.senderType === 'counselor' ? 'bg-secondary/20' : 'bg-muted'}`}>
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${msg.senderType === 'counselor' ? 'bg-primary/15' : 'bg-muted'}`}>
                     {msg.senderType === 'counselor' ? (
-                      <User className="w-3.5 h-3.5 text-secondary" />
+                      <User className="w-3.5 h-3.5 text-primary" />
                     ) : (
                       <Bot className="w-3.5 h-3.5 text-muted-foreground" />
                     )}
@@ -47,7 +47,7 @@ const MessagesPanel = ({ open, onClose }: MessagesPanelProps) => {
                     <p className="text-[11px] text-muted-foreground truncate">{msg.preview}</p>
                   </div>
                   {msg.unread && (
-                    <div className="w-2 h-2 rounded-full bg-accent shrink-0 mt-2" />
+                    <div className="w-2 h-2 rounded-full bg-destructive shrink-0 mt-2" />
                   )}
                 </div>
               </div>

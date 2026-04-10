@@ -7,11 +7,11 @@ interface RegionMarkersProps {
   onRegionClick: (region: Region) => void;
 }
 
-const statusConfig: Record<RegionStatus, { icon: typeof Lock; ringClass: string; bgClass: string }> = {
-  locked: { icon: Lock, ringClass: 'border-locked', bgClass: 'bg-locked/50' },
-  available: { icon: Sparkles, ringClass: 'border-glow-teal', bgClass: 'bg-glow-teal/20' },
-  in_progress: { icon: Loader2, ringClass: 'border-primary', bgClass: 'bg-primary/20' },
-  restored: { icon: CheckCircle2, ringClass: 'border-restored', bgClass: 'bg-restored/20' },
+const statusConfig: Record<RegionStatus, { icon: typeof Lock; ringColor: string; bgColor: string; textColor: string }> = {
+  locked:      { icon: Lock,         ringColor: 'border-inactive',  bgColor: 'bg-muted',         textColor: 'text-inactive' },
+  available:   { icon: Sparkles,     ringColor: 'border-primary',   bgColor: 'bg-primary/10',    textColor: 'text-primary' },
+  in_progress: { icon: Loader2,      ringColor: 'border-primary',   bgColor: 'bg-primary/15',    textColor: 'text-primary' },
+  restored:    { icon: CheckCircle2, ringColor: 'border-success',   bgColor: 'bg-success/15',    textColor: 'text-success' },
 };
 
 const RegionMarkers = ({ regions, onRegionClick }: RegionMarkersProps) => {
@@ -49,8 +49,8 @@ const RegionMarkers = ({ regions, onRegionClick }: RegionMarkersProps) => {
               {/* Glow ring for active */}
               {isActive && (
                 <motion.div
-                  className={`absolute w-16 h-16 rounded-full ${config.ringClass} border-2 -top-1 -left-1`}
-                  style={{ width: 64, height: 64, left: -8, top: -8 }}
+                  className={`absolute rounded-full ${config.ringColor} border-2`}
+                  style={{ width: 56, height: 56, left: -6, top: -6 }}
                   animate={{ opacity: [0.3, 0.7, 0.3] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 />
@@ -59,24 +59,22 @@ const RegionMarkers = ({ regions, onRegionClick }: RegionMarkersProps) => {
               {/* Marker circle */}
               <div
                 className={`
-                  w-12 h-12 rounded-full flex items-center justify-center
-                  border-2 ${config.ringClass} ${config.bgClass}
-                  backdrop-blur-sm transition-all duration-300
+                  w-11 h-11 rounded-full flex items-center justify-center
+                  border-2 ${config.ringColor} ${config.bgColor}
+                  shadow-md transition-all duration-300 bg-card
                   ${isClickable ? 'group-hover:shadow-lg' : 'opacity-50'}
                 `}
               >
                 <Icon
-                  className={`w-5 h-5 ${
-                    region.status === 'locked' ? 'text-muted-foreground' :
-                    region.status === 'in_progress' ? 'text-primary animate-spin' :
-                    'text-foreground'
+                  className={`w-4.5 h-4.5 ${config.textColor} ${
+                    region.status === 'in_progress' ? 'animate-spin' : ''
                   }`}
                   style={region.status === 'in_progress' ? { animationDuration: '3s' } : {}}
                 />
               </div>
 
               {/* Label */}
-              <div className="glass-panel px-3 py-1 text-center min-w-max">
+              <div className="glass-panel px-3 py-1 text-center min-w-max shadow-sm">
                 <p className="text-xs font-display font-semibold text-foreground leading-tight">
                   {region.name}
                 </p>

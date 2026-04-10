@@ -17,7 +17,7 @@ const TopActionIcons = ({ onMessagesClick, onCommunityClick, onHelpClick, unread
 
   return (
     <motion.div
-      className="absolute top-4 right-80 z-20 flex gap-2"
+      className="absolute top-6 left-1/2 -translate-x-1/2 z-20 flex gap-2"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.6 }}
@@ -33,7 +33,7 @@ const TopActionIcons = ({ onMessagesClick, onCommunityClick, onHelpClick, unread
         >
           <Icon className="w-4 h-4 text-foreground" />
           {badge > 0 && (
-            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-accent text-accent-foreground text-[9px] font-bold flex items-center justify-center">
+            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-destructive text-primary-foreground text-[9px] font-bold flex items-center justify-center">
               {badge}
             </span>
           )}

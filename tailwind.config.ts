@@ -51,24 +51,25 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        ocean: {
-          deep: "hsl(var(--ocean-deep))",
-          mid: "hsl(var(--ocean-mid))",
-          light: "hsl(var(--ocean-light))",
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          soft: "hsl(var(--success-soft))",
         },
-        island: {
-          sand: "hsl(var(--island-sand))",
-          grass: "hsl(var(--island-grass))",
-          forest: "hsl(var(--island-forest))",
+        gold: {
+          DEFAULT: "hsl(var(--gold))",
+          strong: "hsl(var(--gold-strong))",
+          soft: "hsl(var(--gold-soft))",
         },
-        glow: {
-          gold: "hsl(var(--glow-gold))",
-          teal: "hsl(var(--glow-teal))",
-          coral: "hsl(var(--glow-coral))",
+        lavender: {
+          DEFAULT: "hsl(var(--lavender))",
+          soft: "hsl(var(--lavender-soft))",
         },
-        locked: "hsl(var(--locked-gray))",
-        restored: "hsl(var(--restored-green))",
-        progress: "hsl(var(--progress-blue))",
+        info: {
+          DEFAULT: "hsl(var(--info))",
+          soft: "hsl(var(--info-soft))",
+        },
+        warning: "hsl(var(--warning))",
+        inactive: "hsl(var(--inactive))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

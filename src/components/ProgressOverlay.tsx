@@ -15,8 +15,8 @@ const ProgressOverlay = ({ student }: ProgressOverlayProps) => {
       transition={{ delay: 0.7 }}
     >
       <div className="flex items-center gap-2 mb-2">
-        <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-          <Target className="w-4 h-4 text-primary" />
+        <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center">
+          <Target className="w-4 h-4 text-accent" />
         </div>
         <p className="font-display font-bold text-sm text-foreground">Próxima meta</p>
       </div>
