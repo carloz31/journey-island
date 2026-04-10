@@ -13,7 +13,7 @@ interface CommunityPanelProps {
 type Tab = 'classmates' | 'ranking' | 'badges';
 
 const CommunityPanel = ({ open, onClose }: CommunityPanelProps) => {
-  const [tab, setTab] = useState<Tab>('classmates');
+  const [tab, setTab] = useState<Tab>('ranking');
 
   const tabs: { key: Tab; label: string }[] = [
     { key: 'classmates', label: 'Compañeros' },
@@ -27,7 +27,7 @@ const CommunityPanel = ({ open, onClose }: CommunityPanelProps) => {
     <AnimatePresence>
       {open && (
         <motion.div
-          className="absolute top-16 left-1/2 -translate-x-1/2 z-30 glass-panel w-80 max-h-[75vh] flex flex-col"
+          className="absolute top-3 right-14 z-30 glass-panel w-80 max-h-[75vh] flex flex-col"
           initial={{ opacity: 0, y: -10, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -10, scale: 0.95 }}
@@ -40,7 +40,6 @@ const CommunityPanel = ({ open, onClose }: CommunityPanelProps) => {
             </button>
           </div>
 
-          {/* Tabs */}
           <div className="flex border-b border-border">
             {tabs.map(t => (
               <button
@@ -69,7 +68,6 @@ const CommunityPanel = ({ open, onClose }: CommunityPanelProps) => {
                 ))}
               </div>
             )}
-
             {tab === 'ranking' && (
               <div className="space-y-2">
                 {sorted.map((c, i) => (
@@ -86,7 +84,6 @@ const CommunityPanel = ({ open, onClose }: CommunityPanelProps) => {
                 ))}
               </div>
             )}
-
             {tab === 'badges' && (
               <div className="grid grid-cols-2 gap-2">
                 {badgesData.map(b => (
