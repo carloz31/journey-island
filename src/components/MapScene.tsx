@@ -1,5 +1,7 @@
 import { useState, useRef, useCallback, useMemo } from 'react';
 import { regions, Region } from '@/data/mockData';
+import { Plus, Minus, Locate } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
 
 interface MapSceneProps {
   onRegionClick: (region: Region) => void;
@@ -38,10 +40,31 @@ const MapScene = ({ onRegionClick }: MapSceneProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
+  const DEFAULT_VB = { x: 0, y: 0, w: 1000, h: 700 };
+  const MIN_W = 300;
+  const MAX_W = 2000;
+
   // Pan & zoom state
-  const [viewBox, setViewBox] = useState({ x: 0, y: 0, w: 1000, h: 700 });
+  const [viewBox, setViewBox] = useState({ ...DEFAULT_VB });
   const [isPanning, setIsPanning] = useState(false);
   const panStart = useRef({ x: 0, y: 0, vx: 0, vy: 0 });
+
+  // Zoom level as 0-100 slider value (0 = max zoom out, 100 = max zoom in)
+  const zoomSliderValue = Math.round(((MAX_W - viewBox.w) / (MAX_W - MIN_W)) * 100);
+
+  const applyZoom = useCallback((sliderVal: number) => {
+    const newW = MAX_W - (sliderVal / 100) * (MAX_W - MIN_W);
+    const newH = newW * 0.7;
+    setViewBox(vb => {
+      const cx = vb.x + vb.w / 2;
+      const cy = vb.y + vb.h / 2;
+      return { x: cx - newW / 2, y: cy - newH / 2, w: newW, h: newH };
+    });
+  }, []);
+
+  const zoomIn = useCallback(() => applyZoom(Math.min(100, zoomSliderValue + 15)), [applyZoom, zoomSliderValue]);
+  const zoomOut = useCallback(() => applyZoom(Math.max(0, zoomSliderValue - 15)), [applyZoom, zoomSliderValue]);
+  const resetView = useCallback(() => setViewBox({ ...DEFAULT_VB }), []);
 
   const regionMap = useMemo(() => Object.fromEntries(regions.map(r => [r.id, r])), []);
 
@@ -204,6 +227,47 @@ const MapScene = ({ onRegionClick }: MapSceneProps) => {
           );
         })}
       </svg>
+
+      {/* Zoom controls - bottom right */}
+      <div className="absolute bottom-4 right-4 z-20 flex flex-col items-center gap-1.5 glass-panel p-1.5 rounded-xl">
+        <button
+          onClick={zoomIn}
+          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-muted/60 transition-colors text-foreground"
+          title="Zoom in"
+        >
+          <Plus className="w-4 h-4" />
+        </button>
+
+        <div className="h-24 flex items-center py-1">
+          <Slider
+            orientation="vertical"
+            value={[zoomSliderValue]}
+            onValueChange={([v]) => applyZoom(v)}
+            min={0}
+            max={100}
+            step={1}
+            className="h-full"
+          />
+        </div>
+
+        <button
+          onClick={zoomOut}
+          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-muted/60 transition-colors text-foreground"
+          title="Zoom out"
+        >
+          <Minus className="w-4 h-4" />
+        </button>
+
+        <div className="w-full border-t border-border my-0.5" />
+
+        <button
+          onClick={resetView}
+          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-muted/60 transition-colors text-foreground"
+          title="Reset view"
+        >
+          <Locate className="w-4 h-4" />
+        </button>
+      </div>
     </div>
   );
 };
