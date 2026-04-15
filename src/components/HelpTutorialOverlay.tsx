@@ -7,6 +7,7 @@ import { tutorialSteps } from '@/data/mockData';
 interface HelpTutorialOverlayProps {
   open: boolean;
   onClose: () => void;
+  steps?: string[];
 }
 
 const TypewriterText = ({ text, speed = 25 }: { text: string; speed?: number }) => {
@@ -26,15 +27,16 @@ const TypewriterText = ({ text, speed = 25 }: { text: string; speed?: number }) 
   return <span>{displayed}<span className="animate-pulse">|</span></span>;
 };
 
-const HelpTutorialOverlay = ({ open, onClose }: HelpTutorialOverlayProps) => {
+const HelpTutorialOverlay = ({ open, onClose, steps: customSteps }: HelpTutorialOverlayProps) => {
   const [step, setStep] = useState(0);
+  const stepsToUse = customSteps ? customSteps.map(text => ({ text })) : tutorialSteps;
 
   const handleClose = useCallback(() => {
     setStep(0);
     onClose();
   }, [onClose]);
 
-  const isLast = step === tutorialSteps.length - 1;
+  const isLast = step === stepsToUse.length - 1;
   const isFirst = step === 0;
 
   return (
@@ -84,7 +86,7 @@ const HelpTutorialOverlay = ({ open, onClose }: HelpTutorialOverlayProps) => {
 
               {/* Step indicator */}
               <div className="flex gap-1 mb-3">
-                {tutorialSteps.map((_, i) => (
+                {stepsToUse.map((_, i) => (
                   <div
                     key={i}
                     className={`h-1 rounded-full flex-1 transition-colors ${i <= step ? 'bg-primary' : 'bg-muted'}`}
@@ -94,7 +96,7 @@ const HelpTutorialOverlay = ({ open, onClose }: HelpTutorialOverlayProps) => {
 
               {/* Text area */}
               <div className="min-h-[60px] text-sm text-foreground leading-relaxed font-body">
-                <TypewriterText key={step} text={tutorialSteps[step].text} />
+                <TypewriterText key={step} text={stepsToUse[step].text} />
               </div>
 
               {/* Navigation */}
