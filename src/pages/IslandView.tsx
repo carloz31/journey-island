@@ -1,12 +1,14 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, HelpCircle, Lock, CheckCircle2, Loader2 } from 'lucide-react';
+import { ArrowLeft, HelpCircle, Loader2, Plus, Minus, Locate } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { Slider } from '@/components/ui/slider';
 import { startIsland, IslandNode } from '@/data/islandData';
 import IslandActivitySidePanel from '@/components/IslandActivitySidePanel';
 import HelpTutorialOverlay from '@/components/HelpTutorialOverlay';
+import TopBar from '@/components/TopBar';
 
 /* ---------- Loading screen ---------- */
 const IslandLoadingScreen = ({ name, onDone }: { name: string; onDone: () => void }) => {
@@ -44,68 +46,104 @@ const IslandLoadingScreen = ({ name, onDone }: { name: string; onDone: () => voi
   );
 };
 
-/* ---------- Single node on the island SVG ---------- */
+/* ---------- Node positions for horizontal layout ---------- */
+// Main nodes: left-to-right across the center of a 1000x700 canvas
+// Secondary nodes: scattered above and below the main path
+const MAIN_NODE_POSITIONS: Record<string, { x: number; y: number }> = {
+  sk1: { x: 200, y: 350 },
+  sk2: { x: 400, y: 350 },
+  sk3: { x: 600, y: 350 },
+  sk4: { x: 800, y: 350 },
+};
+
+const SECONDARY_NODE_POSITIONS: Record<string, { x: number; y: number }> = {
+  exp1: { x: 300, y: 180 },
+  exp2: { x: 700, y: 520 },
+};
+
+/* ---------- Single node ---------- */
 const NodeCircle = ({ node, cx, cy, onSelect, isSelected }: {
   node: IslandNode; cx: number; cy: number; onSelect: () => void; isSelected: boolean;
 }) => {
-  const r = node.type === 'main' ? 28 : 22;
+  const isMain = node.type === 'main';
+  const r = isMain ? 32 : 26;
   const isLocked = node.status === 'locked';
   const isCompleted = node.status === 'completed';
   const isActive = node.status === 'in_progress';
 
+  // Blue for main, yellow/amber for secondary
+  const colors = isMain
+    ? { bg: 'hsl(210 70% 96%)', border: 'hsl(210 70% 55%)', activeBorder: 'hsl(210 80% 50%)', completedBg: 'hsl(210 60% 92%)', completedBorder: 'hsl(210 60% 45%)', glow: 'hsl(210 80% 55%)' }
+    : { bg: 'hsl(43 90% 95%)', border: 'hsl(43 80% 50%)', activeBorder: 'hsl(43 90% 45%)', completedBg: 'hsl(43 70% 90%)', completedBorder: 'hsl(43 70% 42%)', glow: 'hsl(43 90% 55%)' };
+
+  const getBg = () => {
+    if (isLocked) return 'hsl(205 10% 90%)';
+    if (isCompleted) return colors.completedBg;
+    return colors.bg;
+  };
+  const getBorder = () => {
+    if (isLocked) return 'hsl(205 10% 75%)';
+    if (isCompleted) return colors.completedBorder;
+    if (isActive) return colors.activeBorder;
+    return colors.border;
+  };
+
   return (
-    <g
-      onClick={(e) => { e.stopPropagation(); onSelect(); }}
-      style={{ cursor: 'pointer' }}
-    >
-      {/* Glow ring for active/selected */}
+    <g onClick={(e) => { e.stopPropagation(); onSelect(); }} style={{ cursor: 'pointer' }} data-island>
+      {/* Glow for active/selected */}
       {(isActive || isSelected) && (
-        <circle cx={cx} cy={cy} r={r + 6} fill="none"
-          stroke={isActive ? 'hsl(187 52% 48%)' : 'hsl(43 86% 63%)'}
-          strokeWidth={2.5} opacity={0.5}>
-          <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2s" repeatCount="indefinite" />
+        <circle cx={cx} cy={cy} r={r + 8} fill="none"
+          stroke={colors.glow} strokeWidth={2.5} opacity={0.45}>
+          <animate attributeName="opacity" values="0.25;0.6;0.25" dur="2.2s" repeatCount="indefinite" />
         </circle>
       )}
 
-      {/* Background circle */}
+      {/* Background */}
       <circle cx={cx} cy={cy} r={r}
-        fill={isLocked ? 'hsl(205 10% 88%)' : isCompleted ? 'hsl(140 45% 92%)' : 'hsl(0 0% 100%)'}
-        stroke={isLocked ? 'hsl(205 10% 75%)' : isCompleted ? 'hsl(140 45% 58%)' : isActive ? 'hsl(187 52% 48%)' : 'hsl(196 25% 82%)'}
+        fill={getBg()} stroke={getBorder()}
         strokeWidth={isCompleted || isActive ? 3 : 2}
         filter="url(#nodeShadow)"
       />
 
-      {/* Emoji icon */}
-      <text x={cx} y={cy + 1} textAnchor="middle" dominantBaseline="central"
-        fontSize={node.type === 'main' ? 20 : 16}
-        opacity={isLocked ? 0.4 : 1}
+      {/* Emoji */}
+      <text x={cx} y={cy + 2} textAnchor="middle" dominantBaseline="central"
+        fontSize={isMain ? 22 : 18} opacity={isLocked ? 0.35 : 1}
       >
         {node.imageEmoji}
       </text>
 
-      {/* Lock overlay */}
+      {/* Lock badge */}
       {isLocked && (
-        <g transform={`translate(${cx + r * 0.55}, ${cy - r * 0.55})`}>
-          <circle r={8} fill="hsl(205 10% 60%)" />
-          <text textAnchor="middle" dominantBaseline="central" fontSize={9} fill="white">🔒</text>
+        <g transform={`translate(${cx + r * 0.6}, ${cy - r * 0.6})`}>
+          <circle r={9} fill="hsl(205 10% 60%)" />
+          <text textAnchor="middle" dominantBaseline="central" fontSize={10} fill="white">🔒</text>
         </g>
       )}
 
       {/* Completed check */}
       {isCompleted && (
-        <g transform={`translate(${cx + r * 0.55}, ${cy - r * 0.55})`}>
-          <circle r={9} fill="hsl(140 45% 58%)" />
-          <text textAnchor="middle" dominantBaseline="central" fontSize={10} fill="white">✓</text>
+        <g transform={`translate(${cx + r * 0.6}, ${cy - r * 0.6})`}>
+          <circle r={10} fill={isMain ? 'hsl(210 60% 45%)' : 'hsl(43 70% 42%)'} />
+          <text textAnchor="middle" dominantBaseline="central" fontSize={11} fill="white">✓</text>
         </g>
       )}
 
-      {/* Label below */}
-      <text x={cx} y={cy + r + 14} textAnchor="middle" fontSize={9}
+      {/* Label */}
+      <text x={cx} y={cy + r + 16} textAnchor="middle" fontSize={10}
         fontWeight={600} fill={isLocked ? 'hsl(205 15% 60%)' : 'hsl(205 40% 18%)'}
         className="font-display"
       >
-        {node.title.length > 18 ? node.title.slice(0, 16) + '…' : node.title}
+        {node.title.length > 20 ? node.title.slice(0, 18) + '…' : node.title}
       </text>
+
+      {/* Activity type tag */}
+      {!isLocked && (
+        <text x={cx} y={cy + r + 28} textAnchor="middle" fontSize={8}
+          fill={isMain ? 'hsl(210 50% 50%)' : 'hsl(43 60% 42%)'} opacity={0.7}
+        >
+          {node.activityType}
+        </text>
+      )}
     </g>
   );
 };
@@ -118,7 +156,6 @@ const IslandView = () => {
   const [selectedNode, setSelectedNode] = useState<IslandNode | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
 
-  // For now we only have start island
   const island = startIsland;
 
   const progress = useMemo(() => {
@@ -126,23 +163,84 @@ const IslandView = () => {
     return Math.round((completed / island.nodes.length) * 100);
   }, [island]);
 
-  // Compute node positions on a circular island
-  const CENTER = 250;
-  const ISLAND_R = 140;
+  /* ---- Pan & Zoom (reused from MapScene) ---- */
+  const svgRef = useRef<SVGSVGElement>(null);
+  const DEFAULT_VB = { x: 0, y: 0, w: 1000, h: 700 };
+  const MIN_W = 400;
+  const MAX_W = 1800;
 
+  const [viewBox, setViewBox] = useState({ ...DEFAULT_VB });
+  const [isPanning, setIsPanning] = useState(false);
+  const panStart = useRef({ x: 0, y: 0, vx: 0, vy: 0 });
+
+  const zoomSliderValue = Math.round(((MAX_W - viewBox.w) / (MAX_W - MIN_W)) * 100);
+
+  const applyZoom = useCallback((sliderVal: number) => {
+    const newW = MAX_W - (sliderVal / 100) * (MAX_W - MIN_W);
+    const newH = newW * 0.7;
+    setViewBox(vb => {
+      const cx = vb.x + vb.w / 2;
+      const cy = vb.y + vb.h / 2;
+      return { x: cx - newW / 2, y: cy - newH / 2, w: newW, h: newH };
+    });
+  }, []);
+
+  const zoomIn = useCallback(() => applyZoom(Math.min(100, zoomSliderValue + 15)), [applyZoom, zoomSliderValue]);
+  const zoomOut = useCallback(() => applyZoom(Math.max(0, zoomSliderValue - 15)), [applyZoom, zoomSliderValue]);
+  const resetView = useCallback(() => setViewBox({ ...DEFAULT_VB }), []);
+
+  const getSvgPoint = useCallback((clientX: number, clientY: number) => {
+    const svg = svgRef.current;
+    if (!svg) return { x: 0, y: 0 };
+    const rect = svg.getBoundingClientRect();
+    return {
+      x: ((clientX - rect.left) / rect.width) * viewBox.w + viewBox.x,
+      y: ((clientY - rect.top) / rect.height) * viewBox.h + viewBox.y,
+    };
+  }, [viewBox]);
+
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    e.preventDefault();
+    const factor = e.deltaY > 0 ? 1.1 : 0.9;
+    const pt = getSvgPoint(e.clientX, e.clientY);
+    setViewBox(vb => {
+      const nw = Math.min(MAX_W, Math.max(MIN_W, vb.w * factor));
+      const nh = Math.min(MAX_W * 0.7, Math.max(MIN_W * 0.7, vb.h * factor));
+      const nx = pt.x - (pt.x - vb.x) * (nw / vb.w);
+      const ny = pt.y - (pt.y - vb.y) * (nh / vb.h);
+      return { x: nx, y: ny, w: nw, h: nh };
+    });
+  }, [getSvgPoint]);
+
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    if ((e.target as Element).closest('[data-island]')) return;
+    setIsPanning(true);
+    panStart.current = { x: e.clientX, y: e.clientY, vx: viewBox.x, vy: viewBox.y };
+    (e.currentTarget as Element).setPointerCapture(e.pointerId);
+  }, [viewBox]);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (!isPanning) return;
+    const svg = svgRef.current;
+    if (!svg) return;
+    const rect = svg.getBoundingClientRect();
+    const dx = ((e.clientX - panStart.current.x) / rect.width) * viewBox.w;
+    const dy = ((e.clientY - panStart.current.y) / rect.height) * viewBox.h;
+    setViewBox(vb => ({ ...vb, x: panStart.current.vx - dx, y: panStart.current.vy - dy }));
+  }, [isPanning, viewBox.w, viewBox.h]);
+
+  const handlePointerUp = useCallback(() => setIsPanning(false), []);
+
+  /* ---- Node position lookup ---- */
   const nodePositions = useMemo(() => {
     return island.nodes.map(node => {
-      const angleRad = (node.angle - 90) * (Math.PI / 180);
-      const r = ISLAND_R * node.radius;
-      return {
-        node,
-        cx: CENTER + Math.cos(angleRad) * r,
-        cy: CENTER + Math.sin(angleRad) * r,
-      };
+      const pos = node.type === 'main'
+        ? MAIN_NODE_POSITIONS[node.id] || { x: 500, y: 350 }
+        : SECONDARY_NODE_POSITIONS[node.id] || { x: 500, y: 250 };
+      return { node, cx: pos.x, cy: pos.y };
     });
   }, [island]);
 
-  // Main path connections
   const mainPathPositions = useMemo(() => {
     return island.mainPath.map(id => nodePositions.find(np => np.node.id === id)!).filter(Boolean);
   }, [island, nodePositions]);
@@ -153,124 +251,163 @@ const IslandView = () => {
         {loading && <IslandLoadingScreen name={island.name} onDone={() => setLoading(false)} />}
       </AnimatePresence>
 
-      {/* Top bar */}
-      <div className="relative z-10 flex items-center justify-between px-4 py-3 border-b border-border bg-card/90 backdrop-blur-md">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/adventure')} className="rounded-full">
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div>
-            <h1 className="font-display text-base font-bold text-foreground leading-tight">{island.name}</h1>
-            <p className="text-xs text-muted-foreground">{island.subtitle}</p>
-          </div>
-        </div>
+      {/* System TopBar — same as Adventure */}
+      <TopBar
+        onLogout={() => navigate('/')}
+        onMessagesClick={() => {}}
+      />
 
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 min-w-[140px]">
-            <Progress value={progress} className="h-2.5 flex-1" />
-            <span className="text-xs font-bold text-foreground">{progress}%</span>
-          </div>
-          <Button variant="ghost" size="icon" onClick={() => setHelpOpen(true)} className="rounded-full">
-            <HelpCircle className="w-5 h-5 text-muted-foreground" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Island map area */}
-      <div className="flex-1 relative overflow-hidden"
+      {/* Map area */}
+      <div className="relative flex-1 overflow-hidden"
         style={{ background: 'linear-gradient(180deg, hsl(199 60% 85%) 0%, hsl(199 50% 92%) 50%, hsl(199 55% 82%) 100%)' }}
       >
+        {/* Floating overlay: back button + island name + progress + help */}
         {!loading && (
           <motion.div
-            className="w-full h-full flex items-center justify-center"
-            initial={{ scale: 0.85, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 20, delay: 0.1 }}
+            className="absolute top-3 left-3 right-3 z-20 flex items-center justify-between"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
           >
-            <svg viewBox="0 0 500 500" className="w-full h-full max-w-[600px] max-h-[600px]" style={{ touchAction: 'none' }}>
-              <defs>
-                <filter id="nodeShadow">
-                  <feDropShadow dx="0" dy="2" stdDeviation="3" floodOpacity="0.12" />
-                </filter>
-                <filter id="islandGlow">
-                  <feGaussianBlur stdDeviation="8" result="blur" />
-                  <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-                </filter>
-                <radialGradient id="islandGrad" cx="40%" cy="35%">
-                  <stop offset="0%" stopColor="hsl(140 50% 72%)" />
-                  <stop offset="55%" stopColor="hsl(140 40% 60%)" />
-                  <stop offset="100%" stopColor="hsl(140 30% 50%)" />
-                </radialGradient>
-                <radialGradient id="islandInner" cx="45%" cy="40%">
-                  <stop offset="0%" stopColor="hsl(140 55% 78%)" stopOpacity="0.5" />
-                  <stop offset="100%" stopColor="hsl(140 40% 60%)" stopOpacity="0" />
-                </radialGradient>
-              </defs>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="icon"
+                className="glass-panel w-9 h-9 rounded-xl"
+                onClick={() => navigate('/adventure')}
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+              <div className="glass-panel px-3 py-1.5 rounded-xl">
+                <p className="font-display text-sm font-bold text-foreground leading-tight">{island.name}</p>
+                <p className="text-[10px] text-muted-foreground">{island.subtitle}</p>
+              </div>
+            </div>
 
-              {/* Ocean waves */}
-              {[0, 1, 2].map(i => (
-                <ellipse key={i} cx={CENTER} cy={CENTER + 10}
-                  rx={ISLAND_R + 35 + i * 18} ry={ISLAND_R + 20 + i * 14}
-                  fill="none" stroke="hsl(199 55% 75%)" strokeWidth={1}
-                  opacity={0.25 - i * 0.06} strokeDasharray="8,12"
-                >
-                  <animateTransform attributeName="transform" type="rotate"
-                    from={`${i % 2 === 0 ? 0 : 360} ${CENTER} ${CENTER}`}
-                    to={`${i % 2 === 0 ? 360 : 0} ${CENTER} ${CENTER}`}
-                    dur={`${40 + i * 15}s`} repeatCount="indefinite" />
-                </ellipse>
-              ))}
-
-              {/* Island shadow */}
-              <ellipse cx={CENTER + 4} cy={CENTER + 12} rx={ISLAND_R + 8} ry={ISLAND_R - 10}
-                fill="hsl(199 40% 60%)" opacity={0.15} />
-
-              {/* Main island body */}
-              <ellipse cx={CENTER} cy={CENTER} rx={ISLAND_R + 5} ry={ISLAND_R - 5}
-                fill="url(#islandGrad)" filter="url(#islandGlow)" />
-
-              {/* Inner highlight */}
-              <ellipse cx={CENTER - 15} cy={CENTER - 15} rx={ISLAND_R * 0.6} ry={ISLAND_R * 0.5}
-                fill="url(#islandInner)" />
-
-              {/* Decorative elements on island */}
-              <circle cx={CENTER - 80} cy={CENTER - 50} r={6} fill="hsl(140 50% 68%)" opacity={0.5} />
-              <circle cx={CENTER + 70} cy={CENTER + 40} r={5} fill="hsl(140 60% 72%)" opacity={0.4} />
-              <circle cx={CENTER - 50} cy={CENTER + 60} r={4} fill="hsl(43 86% 70%)" opacity={0.35} />
-              <circle cx={CENTER + 90} cy={CENTER - 30} r={3} fill="hsl(140 45% 65%)" opacity={0.4} />
-
-              {/* Main path connections */}
-              {mainPathPositions.map((pos, i) => {
-                if (i === 0) return null;
-                const prev = mainPathPositions[i - 1];
-                const bothCompleted = prev.node.status === 'completed' && pos.node.status === 'completed';
-                const oneActive = prev.node.status === 'completed' && (pos.node.status === 'in_progress' || pos.node.status === 'available');
-                return (
-                  <line key={`path-${i}`}
-                    x1={prev.cx} y1={prev.cy}
-                    x2={pos.cx} y2={pos.cy}
-                    stroke={bothCompleted ? 'hsl(140 45% 58%)' : oneActive ? 'hsl(187 52% 48%)' : 'hsl(205 15% 70%)'}
-                    strokeWidth={bothCompleted ? 3 : 2.5}
-                    strokeDasharray={bothCompleted ? 'none' : '6,6'}
-                    opacity={bothCompleted ? 0.8 : 0.5}
-                    strokeLinecap="round"
-                  />
-                );
-              })}
-
-              {/* Render nodes */}
-              {nodePositions.map(({ node, cx, cy }) => (
-                <NodeCircle
-                  key={node.id}
-                  node={node}
-                  cx={cx}
-                  cy={cy}
-                  onSelect={() => setSelectedNode(node)}
-                  isSelected={selectedNode?.id === node.id}
-                />
-              ))}
-            </svg>
+            <div className="flex items-center gap-2">
+              <div className="glass-panel px-3 py-1.5 rounded-xl flex items-center gap-2 min-w-[130px]">
+                <Progress value={progress} className="h-2 flex-1" />
+                <span className="text-xs font-bold text-foreground">{progress}%</span>
+              </div>
+              <Button variant="ghost" size="icon"
+                className="glass-panel w-9 h-9 rounded-xl"
+                onClick={() => setHelpOpen(true)}
+              >
+                <HelpCircle className="w-4 h-4 text-muted-foreground" />
+              </Button>
+            </div>
           </motion.div>
+        )}
+
+        {/* SVG island scene with pan & zoom */}
+        {!loading && (
+          <svg
+            ref={svgRef}
+            className="w-full h-full"
+            viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`}
+            preserveAspectRatio="xMidYMid slice"
+            onWheel={handleWheel}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            style={{ cursor: isPanning ? 'grabbing' : 'grab', touchAction: 'none' }}
+          >
+            <defs>
+              <filter id="nodeShadow">
+                <feDropShadow dx="0" dy="2" stdDeviation="3" floodOpacity="0.12" />
+              </filter>
+              <filter id="islandGlow">
+                <feGaussianBlur stdDeviation="10" result="blur" />
+                <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+              </filter>
+              <radialGradient id="islandGrad" cx="35%" cy="30%">
+                <stop offset="0%" stopColor="hsl(140 55% 75%)" />
+                <stop offset="60%" stopColor="hsl(140 45% 62%)" />
+                <stop offset="100%" stopColor="hsl(140 35% 52%)" />
+              </radialGradient>
+            </defs>
+
+            {/* Ocean waves */}
+            {[0, 1, 2].map(i => (
+              <ellipse key={i} cx={500} cy={360}
+                rx={420 + i * 30} ry={260 + i * 20}
+                fill="none" stroke="hsl(199 55% 75%)" strokeWidth={1}
+                opacity={0.2 - i * 0.05} strokeDasharray="10,14"
+              >
+                <animateTransform attributeName="transform" type="rotate"
+                  from={`${i % 2 === 0 ? 0 : 360} 500 360`}
+                  to={`${i % 2 === 0 ? 360 : 0} 500 360`}
+                  dur={`${50 + i * 15}s`} repeatCount="indefinite" />
+              </ellipse>
+            ))}
+
+            {/* Island shadow */}
+            <ellipse cx={505} cy={380} rx={340} ry={160}
+              fill="hsl(199 40% 60%)" opacity={0.12} />
+
+            {/* Main island body — large horizontal ellipse */}
+            <ellipse cx={500} cy={350} rx={330} ry={180}
+              fill="url(#islandGrad)" filter="url(#islandGlow)" />
+
+            {/* Inner highlight */}
+            <ellipse cx={460} cy={310} rx={220} ry={110}
+              fill="hsl(140 55% 78%)" opacity={0.3} />
+
+            {/* Decorative dots */}
+            <circle cx={150} cy={300} r={5} fill="hsl(140 50% 68%)" opacity={0.4} />
+            <circle cx={850} cy={400} r={4} fill="hsl(140 60% 72%)" opacity={0.35} />
+            <circle cx={300} cy={450} r={6} fill="hsl(43 86% 70%)" opacity={0.3} />
+            <circle cx={700} cy={260} r={5} fill="hsl(140 45% 65%)" opacity={0.35} />
+            <circle cx={500} cy={480} r={4} fill="hsl(140 50% 70%)" opacity={0.25} />
+
+            {/* Main path connections — left to right */}
+            {mainPathPositions.map((pos, i) => {
+              if (i === 0) return null;
+              const prev = mainPathPositions[i - 1];
+              const bothCompleted = prev.node.status === 'completed' && pos.node.status === 'completed';
+              const oneActive = prev.node.status === 'completed' && (pos.node.status === 'in_progress' || pos.node.status === 'available');
+              return (
+                <line key={`path-${i}`}
+                  x1={prev.cx} y1={prev.cy}
+                  x2={pos.cx} y2={pos.cy}
+                  stroke={bothCompleted ? 'hsl(210 60% 45%)' : oneActive ? 'hsl(210 70% 55%)' : 'hsl(205 15% 72%)'}
+                  strokeWidth={bothCompleted ? 3.5 : 2.5}
+                  strokeDasharray={bothCompleted ? 'none' : '8,8'}
+                  opacity={bothCompleted ? 0.8 : 0.45}
+                  strokeLinecap="round"
+                />
+              );
+            })}
+
+            {/* Render nodes */}
+            {nodePositions.map(({ node, cx, cy }) => (
+              <NodeCircle
+                key={node.id}
+                node={node}
+                cx={cx}
+                cy={cy}
+                onSelect={() => setSelectedNode(node)}
+                isSelected={selectedNode?.id === node.id}
+              />
+            ))}
+          </svg>
+        )}
+
+        {/* Zoom controls — bottom right, same style as MapScene */}
+        {!loading && (
+          <div className="absolute bottom-4 right-4 z-20 flex items-center gap-1.5 glass-panel p-1.5 rounded-xl">
+            <button onClick={zoomOut} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-muted/60 transition-colors text-foreground" title="Zoom out">
+              <Minus className="w-4 h-4" />
+            </button>
+            <div className="w-24 flex items-center px-1">
+              <Slider value={[zoomSliderValue]} onValueChange={([v]) => applyZoom(v)} min={0} max={100} step={1} />
+            </div>
+            <button onClick={zoomIn} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-muted/60 transition-colors text-foreground" title="Zoom in">
+              <Plus className="w-4 h-4" />
+            </button>
+            <div className="h-6 border-l border-border mx-0.5" />
+            <button onClick={resetView} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-muted/60 transition-colors text-foreground" title="Reset view">
+              <Locate className="w-4 h-4" />
+            </button>
+          </div>
         )}
       </div>
 
@@ -281,7 +418,7 @@ const IslandView = () => {
         onClose={() => setSelectedNode(null)}
       />
 
-      {/* Help tutorial with Pepe - reuse existing overlay with island-specific steps */}
+      {/* Help tutorial with Pepe */}
       <HelpTutorialOverlay
         open={helpOpen}
         onClose={() => setHelpOpen(false)}
