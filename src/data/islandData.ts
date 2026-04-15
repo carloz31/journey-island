@@ -11,9 +11,9 @@ export interface IslandNode {
   lockedReason?: string;
   duration: string;
   imageEmoji: string;
-  /** Position on the circular island (angle in degrees from top, radius 0-1) */
-  angle: number;
-  radius: number;
+  /** Position on the island canvas (0-1000 x, 0-700 y) */
+  x: number;
+  y: number;
 }
 
 export interface IslandData {
@@ -50,8 +50,8 @@ export const startIsland: IslandData = {
       status: 'completed',
       duration: '20 min',
       imageEmoji: '📖',
-      angle: 220,
-      radius: 0.55,
+      x: 200,
+      y: 350,
     },
     {
       id: 'sk2',
@@ -62,8 +62,8 @@ export const startIsland: IslandData = {
       status: 'completed',
       duration: '15 min',
       imageEmoji: '💪',
-      angle: 290,
-      radius: 0.55,
+      x: 400,
+      y: 350,
     },
     {
       id: 'sk3',
@@ -74,8 +74,8 @@ export const startIsland: IslandData = {
       status: 'in_progress',
       duration: '25 min',
       imageEmoji: '🧭',
-      angle: 0,
-      radius: 0.55,
+      x: 600,
+      y: 350,
     },
     {
       id: 'sk4',
@@ -87,8 +87,8 @@ export const startIsland: IslandData = {
       lockedReason: 'Completa "Mapa de valores" primero',
       duration: '30 min',
       imageEmoji: '✉️',
-      angle: 70,
-      radius: 0.55,
+      x: 800,
+      y: 350,
     },
     {
       id: 'exp1',
@@ -99,8 +99,8 @@ export const startIsland: IslandData = {
       status: 'available',
       duration: '10 min/día',
       imageEmoji: '📝',
-      angle: 150,
-      radius: 0.82,
+      x: 300,
+      y: 180,
     },
     {
       id: 'exp2',
@@ -111,8 +111,8 @@ export const startIsland: IslandData = {
       status: 'available',
       duration: '35 min',
       imageEmoji: '🎨',
-      angle: 330,
-      radius: 0.85,
+      x: 700,
+      y: 520,
     },
   ],
 };
