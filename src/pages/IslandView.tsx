@@ -220,12 +220,11 @@ const IslandView = () => {
 
   /* ---- Node position lookup ---- */
   const nodePositions = useMemo(() => {
-    return island.nodes.map(node => {
-      const pos = node.type === 'main'
-        ? MAIN_NODE_POSITIONS[node.id] || { x: 500, y: 350 }
-        : SECONDARY_NODE_POSITIONS[node.id] || { x: 500, y: 250 };
-      return { node, cx: pos.x, cy: pos.y };
-    });
+    return island.nodes.map(node => ({
+      node,
+      cx: node.x,
+      cy: node.y,
+    }));
   }, [island]);
 
   const mainPathPositions = useMemo(() => {
