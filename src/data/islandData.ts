@@ -11,9 +11,9 @@ export interface IslandNode {
   lockedReason?: string;
   duration: string;
   imageEmoji: string;
-  /** Position on the circular island (angle in degrees from top, radius 0-1) */
-  angle: number;
-  radius: number;
+  /** Position on the island canvas (0-1000 x, 0-700 y) */
+  x: number;
+  y: number;
 }
 
 export interface IslandData {
