@@ -46,20 +46,7 @@ const IslandLoadingScreen = ({ name, onDone }: { name: string; onDone: () => voi
   );
 };
 
-/* ---------- Node positions for horizontal layout ---------- */
-// Main nodes: left-to-right across the center of a 1000x700 canvas
-// Secondary nodes: scattered above and below the main path
-const MAIN_NODE_POSITIONS: Record<string, { x: number; y: number }> = {
-  sk1: { x: 200, y: 350 },
-  sk2: { x: 400, y: 350 },
-  sk3: { x: 600, y: 350 },
-  sk4: { x: 800, y: 350 },
-};
-
-const SECONDARY_NODE_POSITIONS: Record<string, { x: number; y: number }> = {
-  exp1: { x: 300, y: 180 },
-  exp2: { x: 700, y: 520 },
-};
+/* ---------- Node positions now come from IslandNode.x / .y ---------- */
 
 /* ---------- Single node ---------- */
 const NodeCircle = ({ node, cx, cy, onSelect, isSelected }: {
