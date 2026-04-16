@@ -7,10 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import { activityBlocks } from '@/data/counselorMockData';
+import { useClassroom } from '@/contexts/ClassroomContext';
 import { useState } from 'react';
-import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
+import type { ActivityBlock } from '@/data/counselorMockData';
 
 const tipoIcons: Record<string, string> = {
   test: '📝',
@@ -20,7 +19,15 @@ const tipoIcons: Record<string, string> = {
 };
 
 const ActividadesView = () => {
-  const [blocks, setBlocks] = useState(activityBlocks);
+  const { currentClassroom } = useClassroom();
+  const [blocks, setBlocks] = useState<ActivityBlock[]>(currentClassroom.activityBlocks);
+
+  // Reset blocks when classroom changes
+  const [lastClassroomId, setLastClassroomId] = useState(currentClassroom.id);
+  if (currentClassroom.id !== lastClassroomId) {
+    setBlocks(currentClassroom.activityBlocks);
+    setLastClassroomId(currentClassroom.id);
+  }
 
   const totalMandatorias = blocks.reduce((a, b) => a + b.actividades.filter(act => act.mandatoria).length, 0);
   const totalActividades = blocks.reduce((a, b) => a + b.actividades.length, 0);
@@ -36,7 +43,7 @@ const ActividadesView = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-display font-bold">Actividades y Plan</h1>
-          <p className="text-sm text-muted-foreground">{totalMandatorias} de {totalActividades} actividades marcadas como mandatorias</p>
+          <p className="text-sm text-muted-foreground">{currentClassroom.nombre} · {totalMandatorias} de {totalActividades} actividades marcadas como mandatorias</p>
         </div>
         <Button className="gap-2"><Save className="w-4 h-4" />Guardar Plan</Button>
       </div>
@@ -83,7 +90,6 @@ const ActividadesView = () => {
         ))}
       </Accordion>
 
-      {/* Coverage */}
       <Card>
         <CardHeader className="py-3 px-5"><CardTitle className="text-sm font-display">Cobertura del Plan</CardTitle></CardHeader>
         <CardContent className="space-y-3 pt-0">

@@ -6,16 +6,17 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { students } from '@/data/counselorMockData';
 import StudentDetailPanel from './StudentDetailPanel';
 import type { Student } from '@/data/counselorMockData';
+import { useClassroom } from '@/contexts/ClassroomContext';
 
 const EstudiantesView = () => {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const { currentStudents, currentClassroom } = useClassroom();
 
-  const filtered = students.filter(s => {
+  const filtered = currentStudents.filter(s => {
     const matchSearch = `${s.nombre} ${s.apellido}`.toLowerCase().includes(search.toLowerCase());
     const matchFilter = filter === 'all' || (filter === 'riesgo' && s.riesgo) || s.hollandType === filter;
     return matchSearch && matchFilter;
@@ -23,7 +24,10 @@ const EstudiantesView = () => {
 
   return (
     <div className="p-6 space-y-6 max-w-[1600px] mx-auto">
-      <h1 className="text-2xl font-display font-bold">Estudiantes</h1>
+      <div>
+        <h1 className="text-2xl font-display font-bold">Estudiantes</h1>
+        <p className="text-sm text-muted-foreground">Estudiantes de: {currentClassroom.nombre}</p>
+      </div>
 
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-sm">
