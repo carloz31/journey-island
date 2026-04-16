@@ -111,11 +111,11 @@ const IslandActivitySidePanel = ({ node, open, onClose }: Props) => {
                     <Eye className="w-4 h-4 mr-2" /> Ver resultado
                   </Button>
                 ) : node.status === 'in_progress' ? (
-                  <Button className="w-full">
+                  <Button className="w-full" onClick={handleStart}>
                     <RotateCcw className="w-4 h-4 mr-2" /> Continuar
                   </Button>
                 ) : (
-                  <Button className="w-full">
+                  <Button className="w-full" onClick={handleStart}>
                     <Play className="w-4 h-4 mr-2" /> Comenzar
                   </Button>
                 )}
