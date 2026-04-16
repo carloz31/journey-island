@@ -26,10 +26,6 @@ const TopBar = ({ onLogout, onMessagesClick }: TopBarProps) => {
           )}
         </Button>
 
-        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onLogout}>
-          <LogOut className="w-4 h-4 text-muted-foreground" />
-        </Button>
-
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs">
