@@ -12,6 +12,7 @@ export interface StepAnswer {
   likertValue?: number | null;
   uploadedFile?: File | null;
   dragOrder?: string[];
+  dragMatches?: Record<string, string>;
 }
 
 interface Props {
@@ -40,7 +41,12 @@ export function isStepComplete(step: ActivityStep, answer: StepAnswer): boolean 
     case 'file_upload':
       return answer.uploadedFile != null;
     case 'drag_drop':
-      return true; // always completable for now
+      if (step.mode === 'match' && step.pairs) {
+        const matches = answer.dragMatches ?? {};
+        const allCorrect = step.pairs.every(p => matches[p.id] === p.match);
+        return step.requireAllCorrect ? allCorrect : Object.keys(matches).length === step.pairs.length;
+      }
+      return true;
     default:
       return true;
   }
@@ -88,6 +94,8 @@ const StepRenderer = ({ step, answer, onAnswerChange }: Props) => {
           step={step}
           order={answer.dragOrder ?? step.items.map(i => i.id)}
           onReorder={o => onAnswerChange({ dragOrder: o })}
+          matches={answer.dragMatches ?? {}}
+          onMatchChange={m => onAnswerChange({ dragMatches: m })}
         />
       );
     default:

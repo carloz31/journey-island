@@ -161,8 +161,8 @@ const ActivityPlayer = () => {
               className="absolute inset-0 flex flex-col"
             >
               {/* Scrollable area: dialogue (if any) + content + nav button */}
-              <div className="flex-1 overflow-auto px-4 py-4">
-                <div className="max-w-3xl mx-auto flex flex-col gap-4">
+              <div className="flex-1 overflow-auto px-3 sm:px-4 py-3">
+                <div className="max-w-5xl mx-auto flex flex-col gap-3">
                   {/* Dialogue — shown inline, not as a separate phase */}
                   {hasDialogue && 'dialogue' in step && step.dialogue && (
                     <DialogueLayer
@@ -178,8 +178,8 @@ const ActivityPlayer = () => {
               </div>
 
               {/* Bottom nav */}
-              <div className="shrink-0 p-4 z-20">
-                <div className="max-w-3xl mx-auto flex justify-between">
+              <div className="shrink-0 p-3 z-20">
+                <div className="max-w-5xl mx-auto flex justify-between">
                   {currentStep > 0 ? (
                     <button
                       onClick={handleBack}
