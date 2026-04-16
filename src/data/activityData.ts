@@ -19,7 +19,7 @@ export interface RpgStep {
 export interface ContentStep {
   type: 'content';
   title?: string;
-  body: string;            // rich text / markdown-ish
+  body: string;
   imageUrl?: string;
   withDialogue?: boolean;
   dialogue?: { character: string; avatar: string; text: string };
@@ -38,7 +38,7 @@ export interface OpenQuestionStep {
 export interface MultipleChoiceOption {
   id: string;
   label: string;
-  isCorrect?: boolean;     // used only in 'validation' / 'quiz' modes
+  isCorrect?: boolean;
 }
 
 export interface MultipleChoiceStep {
@@ -65,7 +65,7 @@ export interface LikertStep {
 export interface FileUploadStep {
   type: 'file_upload';
   prompt: string;
-  accept?: string;         // e.g. ".pdf,.png,.jpg"
+  accept?: string;
   withDialogue?: boolean;
   dialogue?: { character: string; avatar: string; text: string };
 }
@@ -79,7 +79,7 @@ export interface DragDropStep {
   type: 'drag_drop';
   instruction: string;
   items: DragDropItem[];
-  correctOrder?: string[]; // optional correct order by id
+  correctOrder?: string[];
   withDialogue?: boolean;
   dialogue?: { character: string; avatar: string; text: string };
 }
@@ -143,68 +143,129 @@ export const activitiesMap: Record<string, Activity> = {
       },
     ],
   },
+
+  /* Activity with one sample of every step type */
   'act-sk3': {
     id: 'act-sk3',
     nodeId: 'sk3',
-    title: 'Mi punto de partida',
-    pointsReward: 15,
+    title: 'Explora todos los tipos de paso',
+    pointsReward: 25,
     steps: [
+      // 1 — RPG intro
       {
         type: 'rpg',
         character: 'Pepe',
         avatar: '🐒',
-        text: 'Antes de avanzar, necesitamos saber dónde estás parado. ¡Vamos a explorar juntos!',
+        text: '¡Vamos a probar todos los tipos de actividades que tenemos! Prepárate. 🎮',
       },
+      // 2 — Content with dialogue
+      {
+        type: 'content',
+        title: 'Los tipos de inteligencia',
+        body: 'Howard Gardner propuso que existen múltiples tipos de inteligencia: lingüística, lógico-matemática, musical, espacial, corporal, interpersonal, intrapersonal y naturalista. Cada persona tiene un perfil único.',
+        withDialogue: true,
+        dialogue: {
+          character: 'Pepe',
+          avatar: '🐒',
+          text: 'Lee con atención esta información, es clave para entenderte mejor. 📚',
+        },
+      },
+      // 3 — Multiple choice (free) with dialogue
       {
         type: 'multiple_choice',
-        question: '¿Qué tan claro tienes lo que te gustaría hacer en el futuro?',
+        question: '¿Cuál de estas inteligencias sientes más fuerte en ti?',
         mode: 'free',
         layout: 'cards',
         options: [
-          { id: 'a', label: 'Muy claro 🎯' },
-          { id: 'b', label: 'Tengo algunas ideas 💡' },
-          { id: 'c', label: 'No estoy seguro 🤔' },
-          { id: 'd', label: 'No tengo idea 🌀' },
+          { id: 'a', label: 'Lingüística 📝' },
+          { id: 'b', label: 'Lógico-matemática 🔢' },
+          { id: 'c', label: 'Musical 🎵' },
+          { id: 'd', label: 'Interpersonal 🤝' },
         ],
         withDialogue: true,
         dialogue: {
           character: 'Pepe',
           avatar: '🐒',
-          text: '¿Qué tan claro tienes hoy lo que te gustaría hacer en el futuro? 🧭',
+          text: 'No hay respuesta correcta, elige la que más te represente. 🧭',
         },
       },
+      // 4 — Open question with dialogue
       {
         type: 'open_question',
-        question: '¿Qué es lo que más disfrutas hacer en tu tiempo libre?',
-        placeholder: 'Escribe aquí tu respuesta...',
+        question: '¿Por qué elegiste esa inteligencia? Describe un momento donde la hayas usado.',
+        placeholder: 'Escribe aquí tu reflexión...',
         maxLength: 500,
         required: true,
         withDialogue: true,
         dialogue: {
           character: 'Pepe',
           avatar: '🐒',
-          text: 'Cuéntame un poco sobre ti. No hay respuestas incorrectas. ✍️',
+          text: 'Tómate tu tiempo para reflexionar. ✍️',
         },
       },
+      // 5 — Likert with dialogue
       {
         type: 'likert',
-        question: '¿Qué tanto te gusta trabajar en equipo?',
+        question: '¿Qué tanto disfrutas aprender cosas nuevas?',
         min: 1,
         max: 5,
         minLabel: 'Nada',
-        maxLabel: 'Mucho',
+        maxLabel: 'Muchísimo',
         withDialogue: true,
         dialogue: {
           character: 'Pepe',
           avatar: '🐒',
-          text: 'Responde con honestidad, esto nos ayudará a conocerte mejor. 🌟',
+          text: 'Sé honesto, no hay respuestas buenas ni malas. 🌟',
         },
       },
+      // 6 — Multiple choice (validation) — no dialogue
+      {
+        type: 'multiple_choice',
+        question: '¿Quién propuso la teoría de las inteligencias múltiples?',
+        mode: 'validation',
+        layout: 'list',
+        options: [
+          { id: 'a', label: 'Sigmund Freud' },
+          { id: 'b', label: 'Howard Gardner', isCorrect: true },
+          { id: 'c', label: 'Albert Einstein' },
+          { id: 'd', label: 'Jean Piaget' },
+        ],
+      },
+      // 7 — File upload with dialogue
+      {
+        type: 'file_upload',
+        prompt: 'Sube una imagen o documento que represente algo que te apasione.',
+        accept: '.png,.jpg,.jpeg,.pdf',
+        withDialogue: true,
+        dialogue: {
+          character: 'Pepe',
+          avatar: '🐒',
+          text: 'Puede ser una foto, un dibujo, o cualquier cosa que te inspire. 📎',
+        },
+      },
+      // 8 — Drag & drop with dialogue
+      {
+        type: 'drag_drop',
+        instruction: 'Ordena estos valores de más a menos importante para ti:',
+        items: [
+          { id: 'v1', label: 'Creatividad 🎨' },
+          { id: 'v2', label: 'Estabilidad 🏠' },
+          { id: 'v3', label: 'Aventura 🌍' },
+          { id: 'v4', label: 'Ayudar a otros 💛' },
+        ],
+        withDialogue: true,
+        dialogue: {
+          character: 'Pepe',
+          avatar: '🐒',
+          text: 'Arrastra los elementos para ordenarlos según tu preferencia. ↕️',
+        },
+      },
+      // 9 — RPG closing
       {
         type: 'rpg',
         character: 'Pepe',
         avatar: '🐒',
-        text: '¡Genial! Ahora ya tengo una mejor idea de cómo acompañarte. ¡Sigamos adelante! 🚀',
+        text: '¡Excelente trabajo! Has completado todos los tipos de actividad. ¡Eres increíble! 🏆',
       },
     ],
   },
