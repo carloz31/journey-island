@@ -166,7 +166,7 @@ const ActivityPlayer = () => {
               </div>
 
               {/* Optional dialogue layer */}
-              {hasDialogue && !dialogueDismissed && step.type !== 'rpg' && 'dialogue' in step && step.dialogue && (
+              {hasDialogue && !dialogueDismissed && 'dialogue' in step && step.dialogue && (
                 <DialogueLayer
                   character={step.dialogue.character}
                   avatar={step.dialogue.avatar}
