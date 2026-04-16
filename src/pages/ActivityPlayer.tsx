@@ -35,6 +35,18 @@ const ActivityPlayer = () => {
     [currentStep],
   );
 
+  if (!activity) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-background">
+        <p className="text-muted-foreground">Actividad no encontrada.</p>
+      </div>
+    );
+  }
+
+  const totalSteps = activity.steps.length;
+  const progressPct = completed ? 100 : (currentStep / totalSteps) * 100;
+  const step = activity.steps[currentStep];
+  const currentAnswer = answers[currentStep] ?? {};
   const canAdvance = step.type === 'rpg' ? true : isStepComplete(step, currentAnswer);
 
   const handleNext = () => {
