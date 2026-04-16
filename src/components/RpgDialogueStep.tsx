@@ -5,10 +5,12 @@ import type { RpgStep } from '@/data/activityData';
 interface Props {
   step: RpgStep;
   onNext: () => void;
+  onBack?: () => void;
+  isFirst: boolean;
   isLast: boolean;
 }
 
-const RpgDialogueStep = ({ step, onNext, isLast }: Props) => {
+const RpgDialogueStep = ({ step, onNext, onBack, isFirst, isLast }: Props) => {
   const [displayedText, setDisplayedText] = useState('');
   const [done, setDone] = useState(false);
 
@@ -72,7 +74,16 @@ const RpgDialogueStep = ({ step, onNext, isLast }: Props) => {
           </div>
 
           {/* Next button */}
-          <div className="px-6 sm:px-8 pb-4 flex justify-end">
+          <div className="px-6 sm:px-8 pb-4 flex justify-between">
+            {!isFirst ? (
+              <button
+                onClick={onBack}
+                className="px-6 py-2.5 rounded-lg text-sm font-semibold transition-all
+                  bg-background/20 text-primary-foreground hover:bg-background/30 active:scale-95"
+              >
+                ◂ Anterior
+              </button>
+            ) : <div />}
             <button
               onClick={handleClick}
               className="px-6 py-2.5 rounded-lg text-sm font-semibold transition-all
