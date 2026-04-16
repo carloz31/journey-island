@@ -27,12 +27,11 @@ const statusBadge = (estado: string) => {
 
 const StudentDetailPanel = ({ student, onClose }: Props) => {
   const [notes, setNotes] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const tags = ['Seguimiento prioritario', 'Reunión pendiente', 'Derivado'];
   const s = student;
 
   if (!s) return null;
-
-  const tags = ['Seguimiento prioritario', 'Reunión pendiente', 'Derivado'];
-  const [selectedTags, setSelectedTags] = useState<string[]>(s.tags);
 
   const toggleTag = (tag: string) => {
     setSelectedTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]);
