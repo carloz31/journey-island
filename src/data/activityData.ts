@@ -75,11 +75,21 @@ export interface DragDropItem {
   label: string;
 }
 
+export interface MatchPair {
+  id: string;
+  concept: string;
+  match: string;
+}
+
 export interface DragDropStep {
   type: 'drag_drop';
+  mode?: 'order' | 'match';
   instruction: string;
   items: DragDropItem[];
   correctOrder?: string[];
+  /** For mode: 'match' */
+  pairs?: MatchPair[];
+  requireAllCorrect?: boolean;
   withDialogue?: boolean;
   dialogue?: { character: string; avatar: string; text: string };
 }
