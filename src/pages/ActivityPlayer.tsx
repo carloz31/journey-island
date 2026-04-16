@@ -25,19 +25,6 @@ const ActivityPlayer = () => {
   // Whether optional dialogue has been dismissed for current step
   const [dialogueDismissed, setDialogueDismissed] = useState(false);
 
-  if (!activity) {
-    return (
-      <div className="h-screen flex items-center justify-center bg-background">
-        <p className="text-muted-foreground">Actividad no encontrada.</p>
-      </div>
-    );
-  }
-
-  const totalSteps = activity.steps.length;
-  const progressPct = completed ? 100 : (currentStep / totalSteps) * 100;
-  const step = activity.steps[currentStep];
-  const currentAnswer = answers[currentStep] ?? {};
-
   const updateAnswer = useCallback(
     (patch: Partial<StepAnswer>) => {
       setAnswers(prev => ({
