@@ -38,8 +38,25 @@ export interface Message {
   senderType: 'counselor' | 'system';
   title: string;
   preview: string;
+  body: string[];
   timestamp: string;
   unread: boolean;
+  attachments?: MessageAttachment[];
+  materialLinks?: MessageMaterialLink[];
+}
+
+export interface MessageAttachment {
+  id: string;
+  name: string;
+  type: string;
+  size: string;
+}
+
+export interface MessageMaterialLink {
+  id: string;
+  title: string;
+  description: string;
+  href: string;
 }
 
 export interface Classmate {
@@ -73,11 +90,99 @@ export const studentData: StudentData = {
 };
 
 export const messagesData: Message[] = [
-  { id: 'm1', sender: 'Prof. García', senderType: 'counselor', title: '¡Gran avance!', preview: 'He visto tu progreso en Autoconocimiento. Sigue así...', timestamp: 'Hace 2h', unread: true },
-  { id: 'm2', sender: 'Sistema', senderType: 'system', title: 'Nueva actividad disponible', preview: 'Se ha desbloqueado "Feria de carreras virtual" en Exploración.', timestamp: 'Hace 1d', unread: true },
-  { id: 'm3', sender: 'Prof. García', senderType: 'counselor', title: 'Reunión programada', preview: 'Nos vemos el jueves para revisar tu plan vocacional...', timestamp: 'Hace 3d', unread: false },
-  { id: 'm4', sender: 'Sistema', senderType: 'system', title: 'Insignia obtenida', preview: 'Has ganado la insignia "Explorador Inicial" por completar tu primera zona.', timestamp: 'Hace 5d', unread: false },
-  { id: 'm5', sender: 'Prof. García', senderType: 'counselor', title: 'Recurso recomendado', preview: 'Te comparto un video sobre carreras STEM que puede interesarte...', timestamp: 'Hace 1sem', unread: false },
+  {
+    id: 'm1',
+    sender: 'Prof. García',
+    senderType: 'counselor',
+    title: '¡Gran avance!',
+    preview: 'He visto tu progreso en Autoconocimiento. Sigue así...',
+    body: [
+      'He visto tu progreso en Autoconocimiento y me alegra mucho la constancia que estás mostrando.',
+      'Tu reflexión sobre fortalezas tiene ideas muy valiosas. Te recomiendo volver a leerla antes de avanzar a la siguiente actividad.',
+    ],
+    timestamp: 'Hace 2h',
+    unread: true,
+    materialLinks: [
+      {
+        id: 'ml1',
+        title: 'Guía breve de fortalezas personales',
+        description: 'Material para reconocer patrones en tus respuestas.',
+        href: '/materials/fortalezas-personales',
+      },
+    ],
+  },
+  {
+    id: 'm2',
+    sender: 'Sistema',
+    senderType: 'system',
+    title: 'Nueva actividad disponible',
+    preview: 'Se ha desbloqueado "Feria de carreras virtual" en Exploración.',
+    body: [
+      'Se ha desbloqueado "Feria de carreras virtual" en la zona de Exploración.',
+      'Puedes revisar stands, comparar rutas formativas y guardar las opciones que más te llamen la atención.',
+    ],
+    timestamp: 'Hace 1d',
+    unread: true,
+    attachments: [
+      { id: 'a1', name: 'Mapa de feria virtual.pdf', type: 'PDF', size: '1.8 MB' },
+    ],
+  },
+  {
+    id: 'm3',
+    sender: 'Prof. García',
+    senderType: 'counselor',
+    title: 'Reunión programada',
+    preview: 'Nos vemos el jueves para revisar tu plan vocacional...',
+    body: [
+      'Nos vemos el jueves para revisar tu plan vocacional y conversar sobre las actividades que más disfrutaste.',
+      'Trae dos preguntas sobre carreras o áreas profesionales que quieras explorar con más calma.',
+    ],
+    timestamp: 'Hace 3d',
+    unread: false,
+    attachments: [
+      { id: 'a2', name: 'Agenda de reunión.docx', type: 'DOCX', size: '240 KB' },
+    ],
+  },
+  {
+    id: 'm4',
+    sender: 'Sistema',
+    senderType: 'system',
+    title: 'Insignia obtenida',
+    preview: 'Has ganado la insignia "Explorador Inicial" por completar tu primera zona.',
+    body: [
+      'Has ganado la insignia "Explorador Inicial" por completar tu primera zona.',
+      'Tu avance ya se refleja en el mapa de aventura. Sigue completando actividades para desbloquear nuevas zonas.',
+    ],
+    timestamp: 'Hace 5d',
+    unread: false,
+  },
+  {
+    id: 'm5',
+    sender: 'Prof. García',
+    senderType: 'counselor',
+    title: 'Recurso recomendado',
+    preview: 'Te comparto un video sobre carreras STEM que puede interesarte...',
+    body: [
+      'Te comparto un video sobre carreras STEM que puede interesarte por las preferencias que marcaste.',
+      'Míralo con calma y anota tres ideas que te hayan sorprendido. Las podemos conversar en la próxima sesión.',
+    ],
+    timestamp: 'Hace 1sem',
+    unread: false,
+    materialLinks: [
+      {
+        id: 'ml2',
+        title: 'Video: un día en carreras STEM',
+        description: 'Historias cortas de profesionales en ciencia, tecnología e ingeniería.',
+        href: '/materials/stem-video',
+      },
+      {
+        id: 'ml3',
+        title: 'Ficha de exploración de carreras',
+        description: 'Plantilla para registrar intereses, dudas y próximos pasos.',
+        href: '/materials/ficha-exploracion',
+      },
+    ],
+  },
 ];
 
 export const classmatesData: Classmate[] = [

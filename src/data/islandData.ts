@@ -43,7 +43,7 @@ export const startIsland: IslandData = {
   nodes: [
     {
       id: 'sk1',
-      title: 'Bienvenida al viaje',
+      title: 'Bienvenido al viaje',
       description: 'Reflexiona sobre los momentos clave que te han formado. Escribe sobre las experiencias que han moldeado quien eres hoy.',
       type: 'main',
       activityType: 'Información',
@@ -87,7 +87,7 @@ export const startIsland: IslandData = {
       lockedReason: 'Completa "Mapa de valores" primero',
       duration: '30 min',
       imageEmoji: '✉️',
-      x: 520,
+      x: 550,
       y: 400,
     },
     {
@@ -100,7 +100,7 @@ export const startIsland: IslandData = {
       lockedReason: 'Completa "Mapa de valores" primero',
       duration: '30 min',
       imageEmoji: '✉️',
-      x: 650,
+      x: 700,
       y: 300,
     },
     {
@@ -113,7 +113,7 @@ export const startIsland: IslandData = {
       lockedReason: 'Completa "Mapa de valores" primero',
       duration: '30 min',
       imageEmoji: '✉️',
-      x: 800,
+      x: 850,
       y: 350,
     },
     {

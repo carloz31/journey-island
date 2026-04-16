@@ -9,7 +9,7 @@ type IslandMapCanvasProps = {
   onSelectNode: (node: IslandNode) => void;
 };
 
-const DEFAULT_VIEW_BOX = { x: 0, y: 0, w: 1000, h: 700 };
+const DEFAULT_VIEW_BOX = { x: -100, y: -70, w: 1200, h: 840 };
 const MIN_WIDTH = 400;
 const MAX_WIDTH = 1800;
 

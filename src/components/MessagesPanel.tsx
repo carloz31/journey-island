@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, Bot } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, X, User, Bot } from 'lucide-react';
 import { messagesData } from '@/data/mockData';
 
 interface MessagesPanelProps {
@@ -26,9 +27,11 @@ const MessagesPanel = ({ open, onClose }: MessagesPanelProps) => {
           </div>
           <div className="overflow-y-auto flex-1 p-2 space-y-1">
             {messagesData.map((msg) => (
-              <div
+              <Link
                 key={msg.id}
-                className={`p-3 rounded-lg cursor-pointer transition-colors hover:bg-muted/60 ${msg.unread ? 'bg-primary/5' : ''}`}
+                to={`/messages?message=${msg.id}`}
+                onClick={onClose}
+                className={`block p-3 rounded-lg cursor-pointer transition-colors hover:bg-muted/60 ${msg.unread ? 'bg-primary/5' : ''}`}
               >
                 <div className="flex items-start gap-2.5">
                   <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${msg.senderType === 'counselor' ? 'bg-primary/15' : 'bg-muted'}`}>
@@ -50,9 +53,17 @@ const MessagesPanel = ({ open, onClose }: MessagesPanelProps) => {
                     <div className="w-2 h-2 rounded-full bg-destructive shrink-0 mt-2" />
                   )}
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
+          <Link
+            to="/messages"
+            onClick={onClose}
+            className="flex items-center justify-between border-t border-border px-4 py-3 text-sm font-semibold text-primary underline-offset-4 transition-colors hover:bg-muted/40 hover:underline"
+          >
+            Ver todos los mensajes
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </motion.div>
       )}
     </AnimatePresence>

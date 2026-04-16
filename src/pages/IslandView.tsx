@@ -11,7 +11,6 @@ import CommunityPanel from '@/components/CommunityPanel';
 import IslandMapCanvas from '@/components/IslandMapCanvas';
 import IslandTopOverlay from '@/components/IslandTopOverlay';
 
-/* ---------- Main Island View ---------- */
 const IslandView = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -35,13 +34,11 @@ const IslandView = () => {
         {loading && <IslandLoadingScreen name={island.name} onDone={() => setLoading(false)} />}
       </AnimatePresence>
 
-      {/* System TopBar — same as Adventure */}
       <TopBar
         onLogout={handleLogout}
         onMessagesClick={() => { setMessagesOpen(o => !o); setCommunityOpen(false); }}
       />
 
-      {/* Map area */}
       <div className="relative flex-1 overflow-hidden"
         style={{ background: 'linear-gradient(180deg, hsl(199 60% 85%) 0%, hsl(199 50% 92%) 50%, hsl(199 55% 82%) 100%)' }}
       >
@@ -63,14 +60,12 @@ const IslandView = () => {
         )}
       </div>
 
-      {/* Activity side panel */}
       <IslandActivitySidePanel
         node={selectedNode}
         open={!!selectedNode}
         onClose={() => setSelectedNode(null)}
       />
 
-      {/* Help tutorial with Pepe */}
       <HelpTutorialOverlay
         open={helpOpen}
         onClose={() => setHelpOpen(false)}

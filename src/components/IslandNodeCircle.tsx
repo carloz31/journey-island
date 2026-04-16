@@ -8,12 +8,42 @@ type IslandNodeCircleProps = {
   onSelect: () => void;
 };
 
+const splitTitleLines = (title: string) => {
+  const words = title.trim().split(/\s+/);
+  if (words.length <= 1) return [title];
+
+  let bestSplit = 1;
+  let bestScore = Infinity;
+
+  for (let i = 1; i < words.length; i += 1) {
+    const firstLine = words.slice(0, i).join(' ');
+    const secondLine = words.slice(i).join(' ');
+    const score = Math.abs(firstLine.length - secondLine.length);
+
+    if (score < bestScore) {
+      bestSplit = i;
+      bestScore = score;
+    }
+  }
+
+  return [
+    words.slice(0, bestSplit).join(' '),
+    words.slice(bestSplit).join(' '),
+  ];
+};
+
 const IslandNodeCircle = ({ node, cx, cy, isSelected, onSelect }: IslandNodeCircleProps) => {
   const isMain = node.type === 'main';
-  const r = isMain ? 32 : 26;
+  const r = isMain ? 22 : 16;
   const isLocked = node.status === 'locked';
   const isCompleted = node.status === 'completed';
   const isActive = node.status === 'in_progress';
+  const titleLines = splitTitleLines(node.title);
+  const labelLineHeight = 12;
+  const labelTop = cy + r + 8;
+  const labelHeight = titleLines.length * labelLineHeight + 6;
+  const labelWidth = Math.max(72, Math.max(...titleLines.map(line => line.length)) * 5.8 + 16);
+  const activityLabelY = labelTop + labelHeight + 10;
 
   const colors = isMain
     ? {
@@ -81,15 +111,29 @@ const IslandNodeCircle = ({ node, cx, cy, isSelected, onSelect }: IslandNodeCirc
         </g>
       )}
 
-      <text x={cx} y={cy + r + 16} textAnchor="middle" fontSize={10}
+      <rect
+        x={cx - labelWidth / 2}
+        y={labelTop}
+        width={labelWidth}
+        height={labelHeight}
+        rx={6}
+        fill="hsl(0 0% 100% / 0.9)"
+        stroke="hsl(205 30% 88%)"
+        strokeWidth={1}
+      />
+      <text textAnchor="middle" fontSize={10}
         fontWeight={600} fill={isLocked ? 'hsl(205 15% 60%)' : 'hsl(205 40% 18%)'}
         className="font-display"
       >
-        {node.title.length > 20 ? node.title.slice(0, 18) + '\u2026' : node.title}
+        {titleLines.map((line, index) => (
+          <tspan key={line} x={cx} y={labelTop + 12 + index * labelLineHeight}>
+            {line}
+          </tspan>
+        ))}
       </text>
 
       {!isLocked && (
-        <text x={cx} y={cy + r + 28} textAnchor="middle" fontSize={8}
+        <text x={cx} y={activityLabelY} textAnchor="middle" fontSize={8}
           fill={isMain ? 'hsl(210 50% 50%)' : 'hsl(43 60% 42%)'} opacity={0.7}
         >
           {node.activityType}

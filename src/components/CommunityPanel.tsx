@@ -10,7 +10,7 @@ interface CommunityPanelProps {
   onClose: () => void;
 }
 
-type Tab = 'classmates' | 'ranking' | 'badges';
+type Tab = 'classmates' | 'ranking';
 
 const CommunityPanel = ({ open, onClose }: CommunityPanelProps) => {
   const [tab, setTab] = useState<Tab>('ranking');
@@ -18,7 +18,6 @@ const CommunityPanel = ({ open, onClose }: CommunityPanelProps) => {
   const tabs: { key: Tab; label: string }[] = [
     { key: 'classmates', label: 'Compañeros' },
     { key: 'ranking', label: 'Ranking' },
-    { key: 'badges', label: 'Insignias' },
   ];
 
   const sorted = [...classmatesData].sort((a, b) => b.progress - a.progress);
@@ -80,20 +79,6 @@ const CommunityPanel = ({ open, onClose }: CommunityPanelProps) => {
                       <Progress value={c.progress} className="h-1 mt-1" />
                     </div>
                     <span className="text-xs font-semibold text-primary">{c.progress}%</span>
-                  </div>
-                ))}
-              </div>
-            )}
-            {tab === 'badges' && (
-              <div className="grid grid-cols-2 gap-2">
-                {badgesData.map(b => (
-                  <div
-                    key={b.id}
-                    className={`p-3 rounded-lg text-center transition-colors ${b.earned ? 'bg-accent/10' : 'bg-muted/50 opacity-40'}`}
-                  >
-                    <span className="text-2xl block mb-1">{b.icon}</span>
-                    <p className="text-[10px] font-semibold text-foreground">{b.name}</p>
-                    {b.earned && <Trophy className="w-3 h-3 text-accent mx-auto mt-1" />}
                   </div>
                 ))}
               </div>
