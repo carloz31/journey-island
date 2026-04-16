@@ -44,7 +44,7 @@ export const startIsland: IslandData = {
     {
       id: 'sk1',
       title: 'Bienvenido al viaje',
-      description: 'Reflexiona sobre los momentos clave que te han formado. Escribe sobre las experiencias que han moldeado quien eres hoy.',
+      description: 'Estás por comenzar una aventura importante. En esta primera parada conocerás de qué trata este recorrido vocacional, cómo te acompañará Pepe y qué irás descubriendo a lo largo del camino.',
       type: 'main',
       activityType: 'Información',
       status: 'completed',
@@ -56,7 +56,7 @@ export const startIsland: IslandData = {
     {
       id: 'sk2',
       title: 'Cómo llego a este momento?',
-      description: 'Identifica tus fortalezas principales con este cuestionario interactivo. Descubre qué te hace único.',
+      description: 'Antes de avanzar, hagamos una pausa. Aquí podrás expresar cómo te sientes frente al cierre del colegio y a la decisión sobre tu futuro.',
       type: 'main',
       activityType: 'Cuestionario',
       status: 'completed',
@@ -68,7 +68,7 @@ export const startIsland: IslandData = {
     {
       id: 'sk3',
       title: 'Mi punto de partida',
-      description: 'Prioriza lo que más importa para ti en la vida. Un ejercicio visual e interactivo para entender tus prioridades.',
+      description: 'Cada viaje comienza reconociendo desde dónde partimos. En esta actividad explorarás qué tan claro tienes hoy tu futuro, cuánto sabes sobre ti y qué conoces del mundo de las profesiones.',
       type: 'main',
       activityType: 'Ejercicio interactivo',
       status: 'in_progress',
@@ -80,7 +80,7 @@ export const startIsland: IslandData = {
     {
       id: 'sk4',
       title: 'Cómo me veo hoy',
-      description: 'Escribe una carta con tus sueños y expectativas para tu yo del futuro. Un momento de introspección profunda.',
+      description: 'Esta actividad te ayudará a mirar cómo te percibes actualmente. Reflexionarás sobre tus fortalezas, intereses y nivel de claridad personal al iniciar este proceso.',
       type: 'main',
       activityType: 'Escritura creativa',
       status: 'locked',
@@ -93,7 +93,7 @@ export const startIsland: IslandData = {
     {
       id: 'sk5',
       title: 'Mis expectativas para este viaje',
-      description: 'Escribe una carta con tus sueños y expectativas para tu yo del futuro. Un momento de introspección profunda.',
+      description: 'Aquí podrás registrar qué esperas de este programa, qué dudas o intereses traes contigo y cómo sientes que tu entorno influye en esta decisión.',
       type: 'main',
       activityType: 'Escritura creativa',
       status: 'locked',
@@ -106,7 +106,7 @@ export const startIsland: IslandData = {
     {
       id: 'sk6',
       title: 'Mi primera entrada del diario',
-      description: 'Escribe una carta con tus sueños y expectativas para tu yo del futuro. Un momento de introspección profunda.',
+      description: 'Tu diario vocacional será un espacio personal para guardar pensamientos, emociones y descubrimientos. En esta primera entrada escribirás cómo llegas al inicio de esta experiencia y qué esperas encontrar.',
       type: 'main',
       activityType: 'Escritura creativa',
       status: 'locked',
@@ -119,7 +119,7 @@ export const startIsland: IslandData = {
     {
       id: 'exp1',
       title: 'Conoce a Pepe',
-      description: 'Registra tus emociones durante una semana para entender mejor tus patrones emocionales.',
+      description: 'Pepe será tu compañero durante esta aventura. En esta breve actividad descubrirás cómo te guiará y de qué manera te acompañará en cada isla.',
       type: 'exploration',
       activityType: 'Actividad libre',
       status: 'available',
@@ -131,7 +131,7 @@ export const startIsland: IslandData = {
     {
       id: 'exp2',
       title: 'Por qué es importante este proceso?',
-      description: 'Crea un collage digital que represente quién eres y quién quieres ser.',
+      description: 'Elegir qué hacer después del colegio no es una decisión menor. Aquí descubrirás por qué vale la pena tomarte este proceso con tiempo, reflexión e información.',
       type: 'exploration',
       activityType: 'Creatividad',
       status: 'available',
@@ -143,26 +143,26 @@ export const startIsland: IslandData = {
     {
       id: 'exp3',
       title: 'Decidir a ciegas',
-      description: 'Crea un collage digital que represente quién eres y quién quieres ser.',
+      description: 'A través de una situación sencilla, reflexionarás sobre lo que puede pasar cuando una decisión vocacional se toma sin considerar todos los factores importantes.',
       type: 'exploration',
       activityType: 'Creatividad',
       status: 'available',
       duration: '35 min',
       imageEmoji: '🎨',
-      x: 500,
+      x: 600,
       y: 150,
     },
     {
       id: 'exp4',
       title: 'Cómo utilizar el diario vocacional',
-      description: 'Crea un collage digital que represente quién eres y quién quieres ser.',
+      description: 'En este espacio aprenderás para qué sirve tu diario, qué tipo de cosas puedes escribir en él y cómo puede ayudarte a lo largo de todo el recorrido.',
       type: 'exploration',
       activityType: 'Creatividad',
       status: 'available',
       duration: '35 min',
       imageEmoji: '🎨',
       x: 700,
-      y: 520,
+      y: 500,
     },
   ],
 };
