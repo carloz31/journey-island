@@ -20,10 +20,7 @@ const ActivityPlayer = () => {
   const [points, setPoints] = useState(0);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
 
-  // Per-step answers keyed by step index
   const [answers, setAnswers] = useState<Record<number, StepAnswer>>({});
-  // Whether optional dialogue has been dismissed for current step
-  const [dialogueDismissed, setDialogueDismissed] = useState(false);
 
   const updateAnswer = useCallback(
     (patch: Partial<StepAnswer>) => {
@@ -52,7 +49,6 @@ const ActivityPlayer = () => {
   const handleNext = () => {
     if (currentStep < totalSteps - 1) {
       setCurrentStep(prev => prev + 1);
-      setDialogueDismissed(false);
     } else {
       setPoints(activity.pointsReward);
       setCompleted(true);
@@ -63,7 +59,7 @@ const ActivityPlayer = () => {
     navigate(`/adventure/island/${regionId ?? 'self-knowledge'}`);
   };
 
-  // Determine if this step has a companion dialogue layer
+  // Check if step has companion dialogue
   const hasDialogue =
     step.type !== 'rpg' &&
     'withDialogue' in step &&
@@ -147,12 +143,10 @@ const ActivityPlayer = () => {
               </div>
             </motion.div>
           ) : step.type === 'rpg' ? (
-            /* RPG-only step — full dialogue, no content area */
             <motion.div key={`rpg-${currentStep}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <RpgDialogueStep step={step} onNext={handleNext} isLast={currentStep === totalSteps - 1} />
             </motion.div>
           ) : (
-            /* Non-RPG steps — content area + optional dialogue + navigation */
             <motion.div
               key={`step-${currentStep}`}
               initial={{ opacity: 0 }}
@@ -160,41 +154,37 @@ const ActivityPlayer = () => {
               exit={{ opacity: 0 }}
               className="absolute inset-0 flex flex-col"
             >
-              {/* Content area — shrink when dialogue visible */}
-              <div className={`flex-1 overflow-auto ${hasDialogue && !dialogueDismissed ? 'pb-48' : 'pb-24'}`}>
-                <StepRenderer step={step} answer={currentAnswer} onAnswerChange={updateAnswer} />
+              {/* Scrollable area: dialogue (if any) + content + nav button */}
+              <div className="flex-1 overflow-auto px-4 py-4">
+                <div className="max-w-3xl mx-auto flex flex-col gap-4">
+                  {/* Dialogue — shown inline, not as a separate phase */}
+                  {hasDialogue && 'dialogue' in step && step.dialogue && (
+                    <DialogueLayer
+                      character={step.dialogue.character}
+                      avatar={step.dialogue.avatar}
+                      text={step.dialogue.text}
+                    />
+                  )}
+
+                  {/* Step content */}
+                  <StepRenderer step={step} answer={currentAnswer} onAnswerChange={updateAnswer} />
+                </div>
               </div>
 
-              {/* Optional dialogue layer */}
-              {hasDialogue && !dialogueDismissed && 'dialogue' in step && step.dialogue && (
-                <DialogueLayer
-                  character={step.dialogue.character}
-                  avatar={step.dialogue.avatar}
-                  text={step.dialogue.text}
-                  onDismiss={() => setDialogueDismissed(true)}
-                />
-              )}
-
-              {/* Navigation bar — shown when dialogue is dismissed or absent */}
-              {(!hasDialogue || dialogueDismissed) && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="absolute bottom-0 inset-x-0 p-4 z-20"
-                >
-                  <div className="max-w-5xl mx-auto flex justify-end">
-                    <button
-                      onClick={handleNext}
-                      disabled={!canAdvance}
-                      className="px-8 py-3 rounded-lg text-sm font-semibold transition-all
-                        bg-accent text-accent-foreground hover:brightness-110 active:scale-95
-                        disabled:opacity-40 disabled:pointer-events-none"
-                    >
-                      {currentStep === totalSteps - 1 ? '✨ Finalizar' : 'Siguiente ▸'}
-                    </button>
-                  </div>
-                </motion.div>
-              )}
+              {/* Bottom nav */}
+              <div className="shrink-0 p-4 z-20">
+                <div className="max-w-3xl mx-auto flex justify-end">
+                  <button
+                    onClick={handleNext}
+                    disabled={!canAdvance}
+                    className="px-8 py-3 rounded-lg text-sm font-semibold transition-all
+                      bg-accent text-accent-foreground hover:brightness-110 active:scale-95
+                      disabled:opacity-40 disabled:pointer-events-none"
+                  >
+                    {currentStep === totalSteps - 1 ? '✨ Finalizar' : 'Siguiente ▸'}
+                  </button>
+                </div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
