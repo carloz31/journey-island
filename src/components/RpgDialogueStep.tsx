@@ -5,6 +5,8 @@ import type { RpgStep } from '@/data/activityData';
 interface Props {
   step: RpgStep;
   onNext: () => void;
+  onBack?: () => void;
+  isFirst: boolean;
   isLast: boolean;
 }
 

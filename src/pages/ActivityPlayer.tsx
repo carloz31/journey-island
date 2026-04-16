@@ -55,6 +55,12 @@ const ActivityPlayer = () => {
     }
   };
 
+  const handleBack = () => {
+    if (currentStep > 0) {
+      setCurrentStep(prev => prev - 1);
+    }
+  };
+
   const handleExit = () => {
     navigate(`/adventure/island/${regionId ?? 'self-knowledge'}`);
   };
