@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Volume2, VolumeX, Trophy } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import RpgDialogueStep from '@/components/RpgDialogueStep';
+import StepRenderer, { isStepComplete, type StepAnswer } from '@/components/steps/StepRenderer';
+import DialogueLayer from '@/components/steps/DialogueLayer';
 import { activitiesMap } from '@/data/activityData';
 
 const ActivityPlayer = () => {
@@ -18,6 +20,21 @@ const ActivityPlayer = () => {
   const [points, setPoints] = useState(0);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
 
+  // Per-step answers keyed by step index
+  const [answers, setAnswers] = useState<Record<number, StepAnswer>>({});
+  // Whether optional dialogue has been dismissed for current step
+  const [dialogueDismissed, setDialogueDismissed] = useState(false);
+
+  const updateAnswer = useCallback(
+    (patch: Partial<StepAnswer>) => {
+      setAnswers(prev => ({
+        ...prev,
+        [currentStep]: { ...prev[currentStep], ...patch },
+      }));
+    },
+    [currentStep],
+  );
+
   if (!activity) {
     return (
       <div className="h-screen flex items-center justify-center bg-background">
@@ -27,11 +44,15 @@ const ActivityPlayer = () => {
   }
 
   const totalSteps = activity.steps.length;
-  const progressPct = completed ? 100 : ((currentStep) / totalSteps) * 100;
+  const progressPct = completed ? 100 : (currentStep / totalSteps) * 100;
+  const step = activity.steps[currentStep];
+  const currentAnswer = answers[currentStep] ?? {};
+  const canAdvance = step.type === 'rpg' ? true : isStepComplete(step, currentAnswer);
 
   const handleNext = () => {
     if (currentStep < totalSteps - 1) {
       setCurrentStep(prev => prev + 1);
+      setDialogueDismissed(false);
     } else {
       setPoints(activity.pointsReward);
       setCompleted(true);
@@ -42,24 +63,32 @@ const ActivityPlayer = () => {
     navigate(`/adventure/island/${regionId ?? 'self-knowledge'}`);
   };
 
-  const step = activity.steps[currentStep];
+  // Determine if this step has a companion dialogue layer
+  const hasDialogue =
+    step.type !== 'rpg' &&
+    'withDialogue' in step &&
+    step.withDialogue &&
+    'dialogue' in step &&
+    step.dialogue;
 
   return (
     <div className="h-screen w-screen flex flex-col overflow-hidden">
-      {/* Fullscreen background */}
-      <div className="absolute inset-0 z-0"
+      {/* Background */}
+      <div
+        className="absolute inset-0 z-0"
         style={{
           background: activity.backgroundUrl
             ? `url(${activity.backgroundUrl}) center/cover`
             : 'linear-gradient(160deg, hsl(var(--primary) / 0.35) 0%, hsl(205 40% 12%) 50%, hsl(var(--accent) / 0.2) 100%)',
         }}
       />
-      {/* Dark overlay */}
       <div className="absolute inset-0 z-[1] bg-foreground/30" />
 
       {/* Top bar */}
-      <header className="relative z-10 flex items-center justify-between px-4 py-3 shrink-0"
-        style={{ background: 'hsla(var(--foreground) / 0.35)', backdropFilter: 'blur(12px)' }}>
+      <header
+        className="relative z-10 flex items-center justify-between px-4 py-3 shrink-0"
+        style={{ background: 'hsla(var(--foreground) / 0.35)', backdropFilter: 'blur(12px)' }}
+      >
         <div className="flex items-center gap-3">
           <div className="flex flex-col gap-0.5">
             <span className="text-xs font-semibold text-primary-foreground/80">
@@ -71,20 +100,26 @@ const ActivityPlayer = () => {
 
         <div className="flex items-center gap-2">
           <span className="text-xs font-bold text-accent">+{points} pts</span>
-          <button onClick={() => setSoundOn(!soundOn)}
-            className="w-8 h-8 rounded-full flex items-center justify-center bg-background/20 hover:bg-background/30 transition-colors">
-            {soundOn
-              ? <Volume2 className="w-4 h-4 text-primary-foreground" />
-              : <VolumeX className="w-4 h-4 text-primary-foreground/50" />}
+          <button
+            onClick={() => setSoundOn(!soundOn)}
+            className="w-8 h-8 rounded-full flex items-center justify-center bg-background/20 hover:bg-background/30 transition-colors"
+          >
+            {soundOn ? (
+              <Volume2 className="w-4 h-4 text-primary-foreground" />
+            ) : (
+              <VolumeX className="w-4 h-4 text-primary-foreground/50" />
+            )}
           </button>
-          <button onClick={() => setShowExitConfirm(true)}
-            className="w-8 h-8 rounded-full flex items-center justify-center bg-background/20 hover:bg-background/30 transition-colors">
+          <button
+            onClick={() => setShowExitConfirm(true)}
+            className="w-8 h-8 rounded-full flex items-center justify-center bg-background/20 hover:bg-background/30 transition-colors"
+          >
             <X className="w-4 h-4 text-primary-foreground" />
           </button>
         </div>
       </header>
 
-      {/* Content area */}
+      {/* Main content area */}
       <div className="relative flex-1 z-10">
         <AnimatePresence mode="wait">
           {completed ? (
@@ -94,8 +129,10 @@ const ActivityPlayer = () => {
               animate={{ opacity: 1, scale: 1 }}
               className="absolute inset-0 flex items-center justify-center"
             >
-              <div className="text-center p-8 rounded-3xl max-w-sm mx-auto"
-                style={{ background: 'hsla(var(--foreground) / 0.65)', backdropFilter: 'blur(20px)' }}>
+              <div
+                className="text-center p-8 rounded-3xl max-w-sm mx-auto"
+                style={{ background: 'hsla(var(--foreground) / 0.65)', backdropFilter: 'blur(20px)' }}
+              >
                 <div className="w-20 h-20 rounded-full bg-accent/20 flex items-center justify-center mx-auto mb-4">
                   <Trophy className="w-10 h-10 text-accent" />
                 </div>
@@ -109,14 +146,54 @@ const ActivityPlayer = () => {
                 </Button>
               </div>
             </motion.div>
+          ) : step.type === 'rpg' ? (
+            /* RPG-only step — full dialogue, no content area */
+            <motion.div key={`rpg-${currentStep}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <RpgDialogueStep step={step} onNext={handleNext} isLast={currentStep === totalSteps - 1} />
+            </motion.div>
           ) : (
-            <motion.div key={currentStep} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              {step.type === 'rpg' && (
-                <RpgDialogueStep
-                  step={step}
-                  onNext={handleNext}
-                  isLast={currentStep === totalSteps - 1}
+            /* Non-RPG steps — content area + optional dialogue + navigation */
+            <motion.div
+              key={`step-${currentStep}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 flex flex-col"
+            >
+              {/* Content area — shrink when dialogue visible */}
+              <div className={`flex-1 overflow-auto ${hasDialogue && !dialogueDismissed ? 'pb-48' : 'pb-24'}`}>
+                <StepRenderer step={step} answer={currentAnswer} onAnswerChange={updateAnswer} />
+              </div>
+
+              {/* Optional dialogue layer */}
+              {hasDialogue && !dialogueDismissed && 'dialogue' in step && step.dialogue && (
+                <DialogueLayer
+                  character={step.dialogue.character}
+                  avatar={step.dialogue.avatar}
+                  text={step.dialogue.text}
+                  onDismiss={() => setDialogueDismissed(true)}
                 />
+              )}
+
+              {/* Navigation bar — shown when dialogue is dismissed or absent */}
+              {(!hasDialogue || dialogueDismissed) && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="absolute bottom-0 inset-x-0 p-4 z-20"
+                >
+                  <div className="max-w-5xl mx-auto flex justify-end">
+                    <button
+                      onClick={handleNext}
+                      disabled={!canAdvance}
+                      className="px-8 py-3 rounded-lg text-sm font-semibold transition-all
+                        bg-accent text-accent-foreground hover:brightness-110 active:scale-95
+                        disabled:opacity-40 disabled:pointer-events-none"
+                    >
+                      {currentStep === totalSteps - 1 ? '✨ Finalizar' : 'Siguiente ▸'}
+                    </button>
+                  </div>
+                </motion.div>
               )}
             </motion.div>
           )}
