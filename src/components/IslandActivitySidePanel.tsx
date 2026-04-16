@@ -1,8 +1,10 @@
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate, useParams } from 'react-router-dom';
 import { X, Lock, Play, RotateCcw, Eye, Clock, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { IslandNode } from '@/data/islandData';
+import { getActivityByNodeId } from '@/data/activityData';
 
 interface Props {
   node: IslandNode | null;
@@ -18,9 +20,18 @@ const statusConfig = {
 };
 
 const IslandActivitySidePanel = ({ node, open, onClose }: Props) => {
+  const navigate = useNavigate();
+  const { regionId } = useParams();
   if (!node) return null;
 
   const cfg = statusConfig[node.status];
+  const activity = getActivityByNodeId(node.id);
+
+  const handleStart = () => {
+    if (activity) {
+      navigate(`/adventure/island/${regionId}/actividad/${activity.id}`);
+    }
+  };
 
   return (
     <AnimatePresence>
