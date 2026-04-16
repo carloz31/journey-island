@@ -172,9 +172,10 @@ export const activitiesMap: Record<string, Activity> = {
         avatar: '🐒',
         text: '¡Vamos a probar todos los tipos de actividades que tenemos! Prepárate. 🎮',
       },
-      // 2 — Content with dialogue
+      // 2 — Content: reading (text) with dialogue
       {
         type: 'content',
+        contentMode: 'text',
         title: 'Los tipos de inteligencia',
         body: 'Howard Gardner propuso que existen múltiples tipos de inteligencia: lingüística, lógico-matemática, musical, espacial, corporal, interpersonal, intrapersonal y naturalista. Cada persona tiene un perfil único.',
         withDialogue: true,
@@ -182,6 +183,34 @@ export const activitiesMap: Record<string, Activity> = {
           character: 'Pepe',
           avatar: '🐒',
           text: 'Lee con atención esta información, es clave para entenderte mejor. 📚',
+        },
+      },
+      // 2b — Content: video
+      {
+        type: 'content',
+        contentMode: 'video',
+        title: 'Mira este video sobre orientación vocacional',
+        body: 'Este video te ayudará a comprender mejor cómo descubrir tu vocación. Míralo completo antes de continuar.',
+        videoUrl: 'https://www.youtube.com/watch?v=IfYkcuiq3X8',
+        withDialogue: true,
+        dialogue: {
+          character: 'Pepe',
+          avatar: '🐒',
+          text: 'Pon atención al video, luego continuaremos. 🎬',
+        },
+      },
+      // 2c — Content: image
+      {
+        type: 'content',
+        contentMode: 'image',
+        title: 'Observa esta imagen',
+        body: 'Analiza la imagen con cuidado. ¿Qué emociones o ideas te provoca?',
+        imageUrl: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80',
+        withDialogue: true,
+        dialogue: {
+          character: 'Pepe',
+          avatar: '🐒',
+          text: 'Tómate un momento para observar con calma. 🖼️',
         },
       },
       // 3 — Multiple choice (free) with dialogue
