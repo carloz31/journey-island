@@ -21,6 +21,10 @@ export interface ContentStep {
   title?: string;
   body: string;
   imageUrl?: string;
+  /** Content mode: 'text' (default), 'image', or 'video' */
+  contentMode?: 'text' | 'image' | 'video';
+  /** YouTube or video URL (used when contentMode is 'video') */
+  videoUrl?: string;
   withDialogue?: boolean;
   dialogue?: { character: string; avatar: string; text: string };
 }
