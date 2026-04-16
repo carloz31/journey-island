@@ -7,8 +7,9 @@ const Index = () => {
   const handleSelectRole = (role: 'student' | 'counselor' | 'parent') => {
     if (role === 'student') {
       navigate('/adventure');
+    } else if (role === 'counselor') {
+      navigate('/counselor');
     }
-    // Other roles: placeholder for now
   };
 
   return <LandingScreen onSelectRole={handleSelectRole} />;
