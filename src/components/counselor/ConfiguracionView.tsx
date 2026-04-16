@@ -66,8 +66,8 @@ const ConfiguracionView = () => {
           <Card>
             <CardHeader><CardTitle className="text-base font-display">Configuración del Aula</CardTitle></CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2"><Label>Nombre del aula</Label><Input defaultValue={counselorProfile.aula} /></div>
-              <div className="space-y-2"><Label>Año académico</Label><Input defaultValue={counselorProfile.anioAcademico} /></div>
+              <div className="space-y-2"><Label>Nombre del aula</Label><Input defaultValue="4to Año B — Promoción 2025" /></div>
+              <div className="space-y-2"><Label>Año académico</Label><Input defaultValue="2025" /></div>
               <Button className="gap-2"><Save className="w-4 h-4" />Guardar</Button>
             </CardContent>
           </Card>

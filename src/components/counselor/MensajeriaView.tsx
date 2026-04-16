@@ -7,10 +7,10 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { messages } from '@/data/counselorMockData';
+import { messages, allStudents, classrooms } from '@/data/counselorMockData';
 
 const MensajeriaView = () => {
   const [selectedMsg, setSelectedMsg] = useState(messages[0]);
@@ -35,9 +35,17 @@ const MensajeriaView = () => {
               <Select>
                 <SelectTrigger><SelectValue placeholder="Seleccionar destinatarios..." /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all_students">Todos los estudiantes</SelectItem>
-                  <SelectItem value="all_parents">Todos los apoderados</SelectItem>
-                  <SelectItem value="all">Todos</SelectItem>
+                  <SelectItem value="all_all">Todos mis aulas</SelectItem>
+                  {classrooms.map(c => (
+                    <SelectGroup key={c.id}>
+                      <SelectLabel className="text-xs font-semibold">{c.nombre}</SelectLabel>
+                      <SelectItem value={`all_students_${c.id}`}>Todos los estudiantes — {c.nombre}</SelectItem>
+                      <SelectItem value={`all_parents_${c.id}`}>Todos los apoderados — {c.nombre}</SelectItem>
+                      {allStudents.filter(s => s.classroomId === c.id).slice(0, 5).map(s => (
+                        <SelectItem key={s.id} value={s.id}>{s.nombre} {s.apellido}</SelectItem>
+                      ))}
+                    </SelectGroup>
+                  ))}
                 </SelectContent>
               </Select>
               <Input placeholder="Asunto" />
@@ -63,7 +71,6 @@ const MensajeriaView = () => {
       </Tabs>
 
       <div className="grid grid-cols-[360px_1fr] gap-4 min-h-[500px]">
-        {/* Message list */}
         <Card className="flex flex-col">
           <ScrollArea className="flex-1">
             <div className="divide-y">
@@ -85,7 +92,6 @@ const MensajeriaView = () => {
           </ScrollArea>
         </Card>
 
-        {/* Message detail */}
         <Card>
           {selectedMsg ? (
             <CardContent className="p-6 space-y-4">

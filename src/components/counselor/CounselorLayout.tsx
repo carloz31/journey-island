@@ -9,12 +9,13 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { counselorProfile } from '@/data/counselorMockData';
 import { useNavigate } from 'react-router-dom';
+import ClassroomSelector from './ClassroomSelector';
 
-export type CounselorView = 'dashboard' | 'aula' | 'estudiantes' | 'actividades' | 'mensajeria' | 'informes' | 'configuracion';
+export type CounselorView = 'dashboard' | 'aulas' | 'estudiantes' | 'actividades' | 'mensajeria' | 'informes' | 'configuracion';
 
 const navItems: { key: CounselorView; label: string; icon: React.ElementType }[] = [
   { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { key: 'aula', label: 'Mi Aula', icon: School },
+  { key: 'aulas', label: 'Mis Aulas', icon: School },
   { key: 'estudiantes', label: 'Estudiantes', icon: Users },
   { key: 'actividades', label: 'Actividades y Plan', icon: ClipboardList },
   { key: 'mensajeria', label: 'Mensajería', icon: MessageSquare },
@@ -98,20 +99,27 @@ const CounselorLayout = ({ activeView, onViewChange, children }: Props) => {
       </motion.aside>
 
       {/* Main content */}
-      <main className="flex-1 overflow-y-auto">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeView}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.15 }}
-            className="h-full"
-          >
-            {children}
-          </motion.div>
-        </AnimatePresence>
-      </main>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Top bar with classroom selector */}
+        <header className="h-12 bg-card border-b border-border flex items-center px-4 gap-3 shrink-0">
+          <ClassroomSelector />
+        </header>
+
+        <main className="flex-1 overflow-y-auto">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeView}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.15 }}
+              className="h-full"
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
+        </main>
+      </div>
     </div>
   );
 };

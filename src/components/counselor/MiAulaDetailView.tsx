@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Search, Plus, Upload, Send, Eye, Mail, Trash2 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Search, Plus, Upload, Send, Eye, Mail, Trash2, ChevronRight } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Checkbox } from '@/components/ui/checkbox';
-import { students, coTeachers, counselorProfile } from '@/data/counselorMockData';
+import { allStudents, classrooms } from '@/data/counselorMockData';
 import type { CounselorView } from './CounselorLayout';
 
 const statusBadge = (estado: string) => {
@@ -25,28 +25,40 @@ const statusBadge = (estado: string) => {
 };
 
 interface Props {
+  classroomId: string;
+  onBack: () => void;
   onViewChange: (view: CounselorView) => void;
 }
 
-const MiAulaView = ({ onViewChange }: Props) => {
+const MiAulaDetailView = ({ classroomId, onBack, onViewChange }: Props) => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [inviteOpen, setInviteOpen] = useState(false);
 
-  const filtered = students.filter(s => {
+  const classroom = classrooms.find(c => c.id === classroomId)!;
+  const classStudents = allStudents.filter(s => s.classroomId === classroomId);
+
+  const filtered = classStudents.filter(s => {
     const matchSearch = `${s.nombre} ${s.apellido}`.toLowerCase().includes(search.toLowerCase());
     const matchStatus = statusFilter === 'all' || s.estado === statusFilter;
     return matchSearch && matchStatus;
   });
 
-  const pendingInvites = students.filter(s => s.estado === 'no_invitado' || s.estado === 'pendiente');
+  const pendingInvites = classStudents.filter(s => s.estado === 'no_invitado' || s.estado === 'pendiente');
 
   return (
     <div className="p-6 space-y-6 max-w-[1600px] mx-auto">
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <button onClick={onBack} className="hover:text-foreground transition-colors">Mis Aulas</button>
+        <ChevronRight className="w-3 h-3" />
+        <span className="text-foreground font-medium">{classroom.nombre}</span>
+      </div>
+
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-display font-bold">Mi Aula</h1>
-          <p className="text-sm text-muted-foreground">{counselorProfile.aula} · {counselorProfile.totalEstudiantes} estudiantes · {counselorProfile.coTutores} co-tutores</p>
+          <h1 className="text-2xl font-display font-bold">{classroom.nombre}</h1>
+          <p className="text-sm text-muted-foreground">{classroom.totalEstudiantes} estudiantes · {classroom.coTutores} co-tutores</p>
         </div>
         <AlertDialog>
           <AlertDialogTrigger asChild>
@@ -55,9 +67,7 @@ const MiAulaView = ({ onViewChange }: Props) => {
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>¿Iniciar el aula?</AlertDialogTitle>
-              <AlertDialogDescription>
-                Se enviarán invitaciones por correo a todos los estudiantes y apoderados registrados. Esta acción no se puede deshacer.
-              </AlertDialogDescription>
+              <AlertDialogDescription>Se enviarán invitaciones por correo a todos los estudiantes y apoderados registrados.</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancelar</AlertDialogCancel>
@@ -74,7 +84,6 @@ const MiAulaView = ({ onViewChange }: Props) => {
         </TabsList>
 
         <TabsContent value="estudiantes" className="space-y-4">
-          {/* Toolbar */}
           <div className="flex items-center gap-3">
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -112,7 +121,6 @@ const MiAulaView = ({ onViewChange }: Props) => {
             </Dialog>
           </div>
 
-          {/* Table */}
           <Card>
             <CardContent className="p-0">
               <Table>
@@ -144,12 +152,7 @@ const MiAulaView = ({ onViewChange }: Props) => {
                         {statusBadge(s.apoderado1.estado)}
                       </TableCell>
                       <TableCell>
-                        {s.apoderado2 ? (
-                          <>
-                            <div className="text-xs">{s.apoderado2.nombre}</div>
-                            {statusBadge(s.apoderado2.estado)}
-                          </>
-                        ) : <span className="text-xs text-muted-foreground">—</span>}
+                        {s.apoderado2 ? (<><div className="text-xs">{s.apoderado2.nombre}</div>{statusBadge(s.apoderado2.estado)}</>) : <span className="text-xs text-muted-foreground">—</span>}
                       </TableCell>
                       <TableCell>{statusBadge(s.estado)}</TableCell>
                       <TableCell className="text-xs text-muted-foreground">{s.ultimaActividad || '—'}</TableCell>
@@ -182,7 +185,7 @@ const MiAulaView = ({ onViewChange }: Props) => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {coTeachers.map(t => (
+                  {classroom.coTeachers.map(t => (
                     <TableRow key={t.id}>
                       <TableCell className="font-medium">{t.nombre}</TableCell>
                       <TableCell className="text-sm text-muted-foreground">{t.correo}</TableCell>
@@ -202,4 +205,4 @@ const MiAulaView = ({ onViewChange }: Props) => {
   );
 };
 
-export default MiAulaView;
+export default MiAulaDetailView;
