@@ -13,6 +13,7 @@ export interface StepAnswer {
   uploadedFile?: File | null;
   dragOrder?: string[];
   dragMatches?: Record<string, string>;
+  contentConfirmed?: boolean;
 }
 
 interface Props {
@@ -27,7 +28,7 @@ export function isStepComplete(step: ActivityStep, answer: StepAnswer): boolean 
     case 'rpg':
       return true; // controlled by dialogue "Next"
     case 'content':
-      return true;
+      return answer.contentConfirmed === true;
     case 'open_question':
       return !step.required || (answer.openText?.trim().length ?? 0) > 0;
     case 'multiple_choice':
@@ -55,7 +56,13 @@ export function isStepComplete(step: ActivityStep, answer: StepAnswer): boolean 
 const StepRenderer = ({ step, answer, onAnswerChange }: Props) => {
   switch (step.type) {
     case 'content':
-      return <ContentStepView step={step} />;
+      return (
+        <ContentStepView
+          step={step}
+          confirmed={answer.contentConfirmed ?? false}
+          onConfirm={() => onAnswerChange({ contentConfirmed: true })}
+        />
+      );
     case 'open_question':
       return (
         <OpenQuestionStepView
