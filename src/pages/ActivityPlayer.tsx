@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Volume2, VolumeX, Trophy } from 'lucide-react';
+import { X, Volume2, VolumeX, Trophy } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import RpgDialogueStep from '@/components/RpgDialogueStep';
@@ -16,6 +16,7 @@ const ActivityPlayer = () => {
   const [completed, setCompleted] = useState(false);
   const [soundOn, setSoundOn] = useState(true);
   const [points, setPoints] = useState(0);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
 
   if (!activity) {
     return (
@@ -60,10 +61,6 @@ const ActivityPlayer = () => {
       <header className="relative z-10 flex items-center justify-between px-4 py-3 shrink-0"
         style={{ background: 'hsla(var(--foreground) / 0.35)', backdropFilter: 'blur(12px)' }}>
         <div className="flex items-center gap-3">
-          <button onClick={handleExit}
-            className="w-8 h-8 rounded-full flex items-center justify-center bg-background/20 hover:bg-background/30 transition-colors">
-            <ArrowLeft className="w-4 h-4 text-primary-foreground" />
-          </button>
           <div className="flex flex-col gap-0.5">
             <span className="text-xs font-semibold text-primary-foreground/80">
               Paso {currentStep + 1} de {totalSteps}
@@ -79,6 +76,10 @@ const ActivityPlayer = () => {
             {soundOn
               ? <Volume2 className="w-4 h-4 text-primary-foreground" />
               : <VolumeX className="w-4 h-4 text-primary-foreground/50" />}
+          </button>
+          <button onClick={() => setShowExitConfirm(true)}
+            className="w-8 h-8 rounded-full flex items-center justify-center bg-background/20 hover:bg-background/30 transition-colors">
+            <X className="w-4 h-4 text-primary-foreground" />
           </button>
         </div>
       </header>
@@ -121,6 +122,47 @@ const ActivityPlayer = () => {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Exit confirmation modal */}
+      <AnimatePresence>
+        {showExitConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center"
+          >
+            <div className="absolute inset-0 bg-foreground/50" onClick={() => setShowExitConfirm(false)} />
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative z-10 rounded-2xl border border-border/30 p-6 max-w-xs w-full mx-4 text-center shadow-2xl"
+              style={{ background: 'hsla(var(--foreground) / 0.85)', backdropFilter: 'blur(20px)' }}
+            >
+              <p className="text-primary-foreground font-semibold mb-1">¿Salir de la actividad?</p>
+              <p className="text-primary-foreground/60 text-sm mb-5">Tu progreso no se guardará.</p>
+              <div className="flex gap-3 justify-center">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowExitConfirm(false)}
+                  className="border-border/40 text-primary-foreground hover:bg-background/20"
+                >
+                  Quedarme
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleExit}
+                  className="bg-destructive text-destructive-foreground hover:brightness-110"
+                >
+                  Salir
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
