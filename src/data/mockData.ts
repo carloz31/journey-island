@@ -304,8 +304,8 @@ export const regions: Region[] = [
 ];
 
 export const availableActivities = [
-  { id: 'sk4', title: 'Carta a mi yo futuro', region: 'Autoconocimiento', type: 'Escritura creativa' },
-  { id: 'ex1', title: 'Feria de carreras virtual', region: 'Exploración', type: 'Exploración' },
-  { id: 'h1', title: 'Taller de comunicación', region: 'Habilidades', type: 'Taller' },
-  { id: 'p1', title: 'Conversación guiada', region: 'Familia', type: 'Guía' },
+  { id: 'sk4', title: 'Carta a mi yo futuro', regionId: 'self-knowledge', region: 'Autoconocimiento', type: 'Escritura creativa' },
+  { id: 'ex1', title: 'Feria de carreras virtual', regionId: 'exploration', region: 'Exploración', type: 'Exploración' },
+  { id: 'h1', title: 'Taller de comunicación', regionId: 'skills', region: 'Habilidades', type: 'Taller' },
+  { id: 'p1', title: 'Conversación guiada', regionId: 'parents', region: 'Familia', type: 'Guía' },
 ];
