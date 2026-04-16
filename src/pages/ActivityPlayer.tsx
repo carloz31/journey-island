@@ -150,7 +150,7 @@ const ActivityPlayer = () => {
             </motion.div>
           ) : step.type === 'rpg' ? (
             <motion.div key={`rpg-${currentStep}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <RpgDialogueStep step={step} onNext={handleNext} isLast={currentStep === totalSteps - 1} />
+              <RpgDialogueStep step={step} onNext={handleNext} onBack={handleBack} isFirst={currentStep === 0} isLast={currentStep === totalSteps - 1} />
             </motion.div>
           ) : (
             <motion.div
@@ -179,7 +179,16 @@ const ActivityPlayer = () => {
 
               {/* Bottom nav */}
               <div className="shrink-0 p-4 z-20">
-                <div className="max-w-3xl mx-auto flex justify-end">
+                <div className="max-w-3xl mx-auto flex justify-between">
+                  {currentStep > 0 ? (
+                    <button
+                      onClick={handleBack}
+                      className="px-8 py-3 rounded-lg text-sm font-semibold transition-all
+                        bg-background/20 text-primary-foreground hover:bg-background/30 active:scale-95"
+                    >
+                      ◂ Anterior
+                    </button>
+                  ) : <div />}
                   <button
                     onClick={handleNext}
                     disabled={!canAdvance}
