@@ -8,6 +8,7 @@ import Adventure from "./pages/Adventure.tsx";
 import IslandView from "./pages/IslandView.tsx";
 import ActivityPlayer from "./pages/ActivityPlayer.tsx";
 import Messages from "./pages/Messages.tsx";
+import VocationalProfile from "./pages/VocationalProfile.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/adventure/island/:regionId" element={<IslandView />} />
           <Route path="/adventure/island/:regionId/actividad/:activityId" element={<ActivityPlayer />} />
           <Route path="/messages" element={<Messages />} />
+          <Route path="/profile" element={<VocationalProfile />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
