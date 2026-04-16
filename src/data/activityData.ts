@@ -75,11 +75,21 @@ export interface DragDropItem {
   label: string;
 }
 
+export interface MatchPair {
+  id: string;
+  concept: string;
+  match: string;
+}
+
 export interface DragDropStep {
   type: 'drag_drop';
+  mode?: 'order' | 'match';
   instruction: string;
   items: DragDropItem[];
   correctOrder?: string[];
+  /** For mode: 'match' */
+  pairs?: MatchPair[];
+  requireAllCorrect?: boolean;
   withDialogue?: boolean;
   dialogue?: { character: string; avatar: string; text: string };
 }
@@ -243,9 +253,10 @@ export const activitiesMap: Record<string, Activity> = {
           text: 'Puede ser una foto, un dibujo, o cualquier cosa que te inspire. 📎',
         },
       },
-      // 8 — Drag & drop with dialogue
+      // 8 — Drag & drop ORDER mode with dialogue
       {
         type: 'drag_drop',
+        mode: 'order',
         instruction: 'Ordena estos valores de más a menos importante para ti:',
         items: [
           { id: 'v1', label: 'Creatividad 🎨' },
@@ -260,7 +271,27 @@ export const activitiesMap: Record<string, Activity> = {
           text: 'Arrastra los elementos para ordenarlos según tu preferencia. ↕️',
         },
       },
-      // 9 — RPG closing
+      // 9 — Drag & drop MATCH mode with dialogue
+      {
+        type: 'drag_drop',
+        mode: 'match',
+        instruction: 'Asocia cada profesión con su descripción:',
+        items: [],
+        pairs: [
+          { id: 'p1', concept: 'Se encarga de capturar delincuentes', match: 'Policía' },
+          { id: 'p2', concept: 'Diseña edificios y estructuras', match: 'Arquitecto' },
+          { id: 'p3', concept: 'Cura enfermedades y cuida la salud', match: 'Doctor' },
+          { id: 'p4', concept: 'Enseña y educa a los estudiantes', match: 'Profesor' },
+        ],
+        requireAllCorrect: true,
+        withDialogue: true,
+        dialogue: {
+          character: 'Pepe',
+          avatar: '🐒',
+          text: 'Arrastra cada profesión al concepto que le corresponde. ¡Todas deben ser correctas! 🎯',
+        },
+      },
+      // 10 — RPG closing
       {
         type: 'rpg',
         character: 'Pepe',
