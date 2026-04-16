@@ -35,7 +35,7 @@ const SidePanel = ({ student, onBadgesClick }: SidePanelProps) => {
   const counselorMarkerY = 56 + Math.sin(counselorAngleRad) * progressRadius;
 
   const quickLinks = [
-    { label: 'Ver perfil', icon: User, onClick: undefined },
+    { label: 'Ver perfil', icon: User, onClick: () => navigate('/profile') },
     { label: 'Ver insignias', icon: Award, onClick: onBadgesClick },
     { label: 'Carreras de interés', icon: Compass, onClick: undefined },
     { label: 'Diario de reflexión', icon: BookOpen, onClick: undefined },
