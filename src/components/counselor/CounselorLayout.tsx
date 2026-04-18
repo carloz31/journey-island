@@ -44,9 +44,9 @@ const CounselorLayout = ({ activeView, onViewChange, children }: Props) => {
         {/* Logo */}
         <div className="flex items-center gap-3 px-4 h-16 border-b border-white/10">
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
-            <span className="font-display font-bold text-sm">VP</span>
+            <span className="font-display font-bold text-sm">MC</span>
           </div>
-          {!collapsed && <span className="font-display font-bold text-sm truncate">VocaPath</span>}
+          {!collapsed && <span className="font-display font-bold text-sm truncate">Mi Camino</span>}
         </div>
 
         {/* Nav */}

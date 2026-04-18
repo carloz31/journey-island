@@ -17,7 +17,6 @@ const ConfiguracionView = () => {
         <TabsList>
           <TabsTrigger value="perfil">Perfil</TabsTrigger>
           <TabsTrigger value="notificaciones">Notificaciones</TabsTrigger>
-          <TabsTrigger value="aula">Aula</TabsTrigger>
           <TabsTrigger value="cuenta">Cuenta</TabsTrigger>
         </TabsList>
 
@@ -58,17 +57,6 @@ const ConfiguracionView = () => {
                   <Switch defaultChecked={i < 3} />
                 </div>
               ))}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="aula" className="mt-4">
-          <Card>
-            <CardHeader><CardTitle className="text-base font-display">Configuración del Aula</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2"><Label>Nombre del aula</Label><Input defaultValue="4to Año B — Promoción 2025" /></div>
-              <div className="space-y-2"><Label>Año académico</Label><Input defaultValue="2025" /></div>
-              <Button className="gap-2"><Save className="w-4 h-4" />Guardar</Button>
             </CardContent>
           </Card>
         </TabsContent>

@@ -89,19 +89,6 @@ const ActividadesView = () => {
           </AccordionItem>
         ))}
       </Accordion>
-
-      <Card>
-        <CardHeader className="py-3 px-5"><CardTitle className="text-sm font-display">Cobertura del Plan</CardTitle></CardHeader>
-        <CardContent className="space-y-3 pt-0">
-          {blocks.flatMap(b => b.actividades.filter(a => a.mandatoria)).map(act => (
-            <div key={act.id} className="flex items-center gap-4">
-              <span className="text-xs w-56 shrink-0 truncate">{act.nombre}</span>
-              <Progress value={(act.completados / act.total) * 100} className="h-2.5 flex-1" />
-              <span className="text-xs font-semibold w-16 text-right">{act.completados}/{act.total}</span>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
     </div>
   );
 };

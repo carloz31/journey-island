@@ -1,4 +1,3 @@
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -7,14 +6,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Download, FileText, CheckCircle2, Clock, Save } from 'lucide-react';
+import { Download, CheckCircle2, Clock, Save, ArrowLeft } from 'lucide-react';
 import type { Student } from '@/data/counselorMockData';
 import { useState } from 'react';
 
 interface Props {
   student: Student | null;
-  onClose: () => void;
+  onBack: () => void;
 }
 
 const statusBadge = (estado: string) => {
@@ -25,13 +23,26 @@ const statusBadge = (estado: string) => {
   }
 };
 
-const StudentDetailPanel = ({ student, onClose }: Props) => {
+const StudentDetailPanel = ({ student, onBack }: Props) => {
   const [notes, setNotes] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const tags = ['Seguimiento prioritario', 'Reunión pendiente', 'Derivado'];
   const s = student;
 
-  if (!s) return null;
+  if (!s) {
+    return (
+      <div className="p-6 max-w-[1200px] mx-auto space-y-6">
+        <Button variant="link" className="h-auto p-0 gap-1" onClick={onBack}>
+          <ArrowLeft className="w-4 h-4" />
+          Volver a estudiantes
+        </Button>
+        <div className="rounded-lg border border-dashed bg-muted/20 p-8 text-center">
+          <h1 className="font-display text-xl font-bold text-foreground">Estudiante no encontrado</h1>
+          <p className="mt-2 text-sm text-muted-foreground">No pudimos encontrar el estudiante solicitado.</p>
+        </div>
+      </div>
+    );
+  }
 
   const toggleTag = (tag: string) => {
     setSelectedTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]);
@@ -44,22 +55,26 @@ const StudentDetailPanel = ({ student, onClose }: Props) => {
   }, {} as Record<string, typeof s.actividadesDetalle>);
 
   return (
-    <Sheet open={!!student} onOpenChange={() => onClose()}>
-      <SheetContent className="w-[560px] sm:max-w-[560px] p-0">
-        <ScrollArea className="h-full">
-          <div className="p-6 space-y-6">
-            <SheetHeader>
-              <div className="flex items-center gap-4">
-                <Avatar className="w-14 h-14">
-                  <AvatarFallback className="bg-primary/10 text-primary font-bold text-lg">{s.nombre[0]}{s.apellido[0]}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <SheetTitle className="text-lg">{s.nombre} {s.apellido}</SheetTitle>
-                  <p className="text-xs text-muted-foreground">{s.correo}</p>
-                </div>
-              </div>
-            </SheetHeader>
+    <div className="p-6 space-y-6 max-w-[1200px] mx-auto">
+      <Button variant="link" className="h-auto p-0 gap-1" onClick={onBack}>
+        <ArrowLeft className="w-4 h-4" />
+        Volver a estudiantes
+      </Button>
 
+      <div className="flex items-center justify-between gap-4 rounded-lg border bg-card p-5 shadow-sm">
+        <div className="flex items-center gap-4">
+          <Avatar className="w-14 h-14">
+            <AvatarFallback className="bg-primary/10 text-primary font-bold text-lg">{s.nombre[0]}{s.apellido[0]}</AvatarFallback>
+          </Avatar>
+          <div>
+            <h1 className="font-display text-2xl font-bold text-foreground">{s.nombre} {s.apellido}</h1>
+            <p className="text-sm text-muted-foreground">{s.correo}</p>
+          </div>
+        </div>
+        {s.riesgo && <Badge variant="destructive">En riesgo</Badge>}
+      </div>
+
+      <div className="rounded-lg border bg-card p-5 shadow-sm">
             <Tabs defaultValue="resumen">
               <TabsList className="w-full">
                 <TabsTrigger value="resumen" className="flex-1">Vista Resumida</TabsTrigger>
@@ -186,10 +201,8 @@ const StudentDetailPanel = ({ student, onClose }: Props) => {
                 </Accordion>
               </TabsContent>
             </Tabs>
-          </div>
-        </ScrollArea>
-      </SheetContent>
-    </Sheet>
+      </div>
+    </div>
   );
 };
 
