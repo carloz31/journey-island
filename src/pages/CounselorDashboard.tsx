@@ -52,6 +52,8 @@ const CounselorDashboard = () => {
       case 'dashboard': return <DashboardView />;
       case 'aulas': return <MisAulasView onViewChange={handleViewChange} />;
       case 'estudiantes': return <EstudiantesView />;
+      case 'apoderados': return <ApoderadosView />;
+      case 'docentes': return <DocentesView />;
       case 'actividades': return <ActividadesView />;
       case 'mensajeria': return <MensajeriaView />;
       case 'informes': return <InformesView />;
