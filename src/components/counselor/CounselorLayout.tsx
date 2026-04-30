@@ -101,11 +101,7 @@ const CounselorLayout = ({ activeView, onViewChange, children }: Props) => {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top bar with classroom selector */}
-        <header className="h-12 bg-card border-b border-border flex items-center px-4 gap-3 shrink-0">
-          <ClassroomSelector />
-        </header>
-
+        {/* Main content */}
         <main className="flex-1 overflow-y-auto">
           <AnimatePresence mode="wait">
             <motion.div
