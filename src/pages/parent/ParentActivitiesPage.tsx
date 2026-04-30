@@ -128,19 +128,21 @@ const ParentActivitiesPage = () => {
 
       <Tabs value={tab} onValueChange={v => setTab(v as 'info' | 'child')} className="w-full">
         <TabsList className="grid w-full grid-cols-2 max-w-md">
-          <TabsTrigger value="info" className="gap-2">
-            <span>Actividades Informativas</span>
-            <span className="text-[11px] tabular-nums text-muted-foreground data-[state=active]:text-foreground/70">
-              {infoCompleted}/{informational.length}
-            </span>
-          </TabsTrigger>
-          <TabsTrigger value="child" className="gap-2">
-            <span>Actividades por Hijo/a</span>
-            <span className="text-[11px] tabular-nums text-muted-foreground">
-              {childCompleted}/{childRelated.length}
-            </span>
-          </TabsTrigger>
+          <TabsTrigger value="info">Actividades Informativas</TabsTrigger>
+          <TabsTrigger value="child">Actividades por Hijo/a</TabsTrigger>
         </TabsList>
+
+        {/* Section progress card (changes per tab) */}
+        <Card className={`mt-4 p-4 flex items-center gap-3 border ${toneFor(sectionPct)}`}>
+          <TrendingUp className="w-5 h-5" />
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] uppercase tracking-wider opacity-80 leading-none">{sectionLabel}</p>
+            <p className="text-lg font-display font-bold leading-tight mt-1">
+              {sectionDone}/{sectionTotal}
+              <span className="text-sm font-semibold opacity-80 ml-2">({sectionPct}%)</span>
+            </p>
+          </div>
+        </Card>
 
         <TabsContent value="info" className="mt-6">
           {renderAccordion(informational, null)}
