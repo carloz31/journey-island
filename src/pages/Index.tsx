@@ -9,6 +9,8 @@ const Index = () => {
       navigate('/adventure');
     } else if (role === 'counselor') {
       navigate('/counselor');
+    } else if (role === 'parent') {
+      navigate('/parents/activities');
     }
   };
 
