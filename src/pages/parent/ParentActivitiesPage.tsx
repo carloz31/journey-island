@@ -18,8 +18,25 @@ const ParentActivitiesPage = () => {
   const informational = parentActivities.filter(a => a.category === 'informational');
   const childRelated = parentActivities.filter(a => a.category === 'child_related');
 
+  const infoCompleted = informational.filter(a => isCompleted(a.id, null)).length;
   const childCompleted = childRelated.filter(a => isCompleted(a.id, selectedChildId)).length;
-  const childPending = childRelated.length - childCompleted;
+
+  // Overall progress = informational (once) + child-related across all children
+  const totalUnits = informational.length + childRelated.length * profile.children.length;
+  const completedUnits =
+    infoCompleted +
+    profile.children.reduce(
+      (sum, c) => sum + childRelated.filter(a => isCompleted(a.id, c.id)).length,
+      0
+    );
+  const overallPct = totalUnits > 0 ? Math.round((completedUnits / totalUnits) * 100) : 0;
+
+  const progressTone =
+    overallPct >= 75
+      ? 'bg-success/15 text-success border-success/30'
+      : overallPct >= 40
+      ? 'bg-warning/15 text-warning border-warning/30'
+      : 'bg-destructive/15 text-destructive border-destructive/30';
 
   const renderAccordion = (activities: typeof parentActivities, childId: string | null) => (
     <Accordion type="single" collapsible className="space-y-3">
