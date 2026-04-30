@@ -38,12 +38,19 @@ const ParentActivitiesPage = () => {
     );
   const overallPct = totalUnits > 0 ? Math.round((completedUnits / totalUnits) * 100) : 0;
 
-  const progressTone =
-    overallPct >= 75
+  const toneFor = (pct: number) =>
+    pct >= 75
       ? 'bg-success/15 text-success border-success/30'
-      : overallPct >= 40
+      : pct >= 40
       ? 'bg-warning/15 text-warning border-warning/30'
       : 'bg-destructive/15 text-destructive border-destructive/30';
+
+  const progressTone = toneFor(overallPct);
+
+  const sectionDone = tab === 'info' ? infoCompleted : childAllCompleted;
+  const sectionTotal = tab === 'info' ? infoTotal : childTotal;
+  const sectionPct = sectionTotal > 0 ? Math.round((sectionDone / sectionTotal) * 100) : 0;
+  const sectionLabel = tab === 'info' ? 'Progreso de actividades informativas' : 'Progreso de actividades por hijo/a (todos)';
 
   const renderAccordion = (activities: typeof parentActivities, childId: string | null) => (
     <Accordion type="single" collapsible className="space-y-3">
