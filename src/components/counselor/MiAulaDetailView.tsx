@@ -146,6 +146,42 @@ const MiAulaDetailView = ({ classroomId, onBack, onViewChange }: Props) => {
               <Input id="aula-anio" value={anio} onChange={e => setAnio(e.target.value)} />
             </div>
           </div>
+
+          <div className="rounded-lg border border-dashed bg-muted/40 p-4 space-y-2">
+            <div className="flex items-center gap-2">
+              <KeyRound className="w-4 h-4 text-primary" />
+              <Label className="text-xs font-semibold">Código de acceso del aula</Label>
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              Estudiantes y apoderados se registran ingresando este código. Mantenlo seguro y compártelo solo con los miembros del aula.
+            </p>
+            <div className="flex items-center gap-2">
+              <Input value={accessCode} readOnly className="font-mono font-semibold text-sm bg-card" />
+              <Button variant="outline" size="sm" className="gap-1.5 shrink-0" onClick={copyCode}>
+                <Copy className="w-3.5 h-3.5" />Copiar
+              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-1.5 shrink-0">
+                    <RefreshCw className="w-3.5 h-3.5" />Regenerar
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>¿Regenerar el código de acceso?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      El código anterior dejará de funcionar. Los estudiantes y apoderados que aún no se han registrado deberán usar el nuevo código. Las cuentas ya vinculadas no se verán afectadas.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={regenerateCode}>Regenerar código</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          </div>
+
           <div className="flex justify-end gap-2">
             <Button variant="outline" size="sm">Cancelar</Button>
             <Button size="sm">Guardar cambios</Button>
