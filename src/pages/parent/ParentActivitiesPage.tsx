@@ -19,7 +19,14 @@ const ParentActivitiesPage = () => {
   const childRelated = parentActivities.filter(a => a.category === 'child_related');
 
   const infoCompleted = informational.filter(a => isCompleted(a.id, null)).length;
-  const childCompleted = childRelated.filter(a => isCompleted(a.id, selectedChildId)).length;
+  const infoTotal = informational.length;
+
+  // Child-related progress aggregated across ALL children
+  const childTotal = childRelated.length * profile.children.length;
+  const childAllCompleted = profile.children.reduce(
+    (sum, c) => sum + childRelated.filter(a => isCompleted(a.id, c.id)).length,
+    0
+  );
 
   // Overall progress = informational (once) + child-related across all children
   const totalUnits = informational.length + childRelated.length * profile.children.length;
@@ -31,12 +38,19 @@ const ParentActivitiesPage = () => {
     );
   const overallPct = totalUnits > 0 ? Math.round((completedUnits / totalUnits) * 100) : 0;
 
-  const progressTone =
-    overallPct >= 75
+  const toneFor = (pct: number) =>
+    pct >= 75
       ? 'bg-success/15 text-success border-success/30'
-      : overallPct >= 40
+      : pct >= 40
       ? 'bg-warning/15 text-warning border-warning/30'
       : 'bg-destructive/15 text-destructive border-destructive/30';
+
+  const progressTone = toneFor(overallPct);
+
+  const sectionDone = tab === 'info' ? infoCompleted : childAllCompleted;
+  const sectionTotal = tab === 'info' ? infoTotal : childTotal;
+  const sectionPct = sectionTotal > 0 ? Math.round((sectionDone / sectionTotal) * 100) : 0;
+  const sectionLabel = tab === 'info' ? 'Progreso de actividades informativas' : 'Progreso de actividades por hijo/a (todos)';
 
   const renderAccordion = (activities: typeof parentActivities, childId: string | null) => (
     <Accordion type="single" collapsible className="space-y-3">
@@ -114,19 +128,21 @@ const ParentActivitiesPage = () => {
 
       <Tabs value={tab} onValueChange={v => setTab(v as 'info' | 'child')} className="w-full">
         <TabsList className="grid w-full grid-cols-2 max-w-md">
-          <TabsTrigger value="info" className="gap-2">
-            <span>Actividades Informativas</span>
-            <span className="text-[11px] tabular-nums text-muted-foreground data-[state=active]:text-foreground/70">
-              {infoCompleted}/{informational.length}
-            </span>
-          </TabsTrigger>
-          <TabsTrigger value="child" className="gap-2">
-            <span>Actividades por Hijo/a</span>
-            <span className="text-[11px] tabular-nums text-muted-foreground">
-              {childCompleted}/{childRelated.length}
-            </span>
-          </TabsTrigger>
+          <TabsTrigger value="info">Actividades Informativas</TabsTrigger>
+          <TabsTrigger value="child">Actividades por Hijo/a</TabsTrigger>
         </TabsList>
+
+        {/* Section progress card (changes per tab) */}
+        <Card className={`mt-4 p-4 flex items-center gap-3 border ${toneFor(sectionPct)}`}>
+          <TrendingUp className="w-5 h-5" />
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] uppercase tracking-wider opacity-80 leading-none">{sectionLabel}</p>
+            <p className="text-lg font-display font-bold leading-tight mt-1">
+              {sectionDone}/{sectionTotal}
+              <span className="text-sm font-semibold opacity-80 ml-2">({sectionPct}%)</span>
+            </p>
+          </div>
+        </Card>
 
         <TabsContent value="info" className="mt-6">
           {renderAccordion(informational, null)}
