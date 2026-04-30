@@ -19,26 +19,43 @@ const EstudiantesView = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
-  const { currentStudents, currentClassroom } = useClassroom();
+  const [classroomFilter, setClassroomFilter] = useState<string>('all');
+  const { allStudents, allClassrooms } = useClassroom();
 
-  const filtered = currentStudents.filter(s => {
+  const classroomById = Object.fromEntries(allClassrooms.map(c => [c.id, c.nombre]));
+
+  const filtered = allStudents.filter(s => {
     const matchSearch = `${s.nombre} ${s.apellido}`.toLowerCase().includes(search.toLowerCase());
     const matchFilter = filter === 'all' || (filter === 'riesgo' && s.riesgo);
-    return matchSearch && matchFilter;
+    const matchClassroom = classroomFilter === 'all' || s.classroomId === classroomFilter;
+    return matchSearch && matchFilter && matchClassroom;
   });
 
   return (
     <div className="p-6 space-y-6 max-w-[1600px] mx-auto">
       <div>
         <h1 className="text-2xl font-display font-bold">Estudiantes</h1>
-        <p className="text-sm text-muted-foreground">Estudiantes de: {currentClassroom.nombre}</p>
+        <p className="text-sm text-muted-foreground">
+          {classroomFilter === 'all'
+            ? `${filtered.length} estudiantes en todas las aulas`
+            : `Estudiantes de: ${classroomById[classroomFilter]}`}
+        </p>
       </div>
 
-      <div className="flex items-center gap-3">
-        <div className="relative flex-1 max-w-sm">
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="relative flex-1 min-w-[220px] max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input placeholder="Buscar..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9" />
         </div>
+        <Select value={classroomFilter} onValueChange={setClassroomFilter}>
+          <SelectTrigger className="w-56"><SelectValue placeholder="Aula" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todas las aulas</SelectItem>
+            {allClassrooms.map(c => (
+              <SelectItem key={c.id} value={c.id}>{c.nombre}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <Select value={filter} onValueChange={setFilter}>
           <SelectTrigger className="w-48"><Filter className="w-4 h-4 mr-2" /><SelectValue placeholder="Filtrar" /></SelectTrigger>
           <SelectContent>
@@ -53,6 +70,7 @@ const EstudiantesView = () => {
           <TableHeader>
             <TableRow>
               <TableHead>Estudiante</TableHead>
+              <TableHead>Aula</TableHead>
               <TableHead>Correo</TableHead>
               <TableHead>Última actividad</TableHead>
               <TableHead className="w-28 text-center">Progreso</TableHead>
@@ -87,6 +105,7 @@ const EstudiantesView = () => {
                         </div>
                       </div>
                     </TableCell>
+                    <TableCell className="text-xs text-muted-foreground">{classroomById[s.classroomId]}</TableCell>
                     <TableCell className="text-xs text-muted-foreground">{s.correo}</TableCell>
                     <TableCell className="text-xs text-muted-foreground">
                       {s.ultimaActividad ?? 'Sin actividad'}
@@ -115,7 +134,7 @@ const EstudiantesView = () => {
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="h-32 text-center text-sm text-muted-foreground">
+                <TableCell colSpan={7} className="h-32 text-center text-sm text-muted-foreground">
                   No se encontraron estudiantes con los filtros seleccionados.
                 </TableCell>
               </TableRow>
