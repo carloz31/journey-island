@@ -29,8 +29,8 @@ const MiAulaDetailView = ({ classroomId, onBack, onViewChange }: Props) => {
   const apoderadosCount = classStudents.reduce((acc, s) => acc + 1 + (s.apoderado2 ? 1 : 0), 0);
   const apoderadosSinCuenta = classStudents.reduce((acc, s) => {
     let n = 0;
-    if (s.apoderado1.estado === 'sin_cuenta') n++;
-    if (s.apoderado2 && s.apoderado2.estado === 'sin_cuenta') n++;
+    if (s.apoderado1.estado !== 'activo') n++;
+    if (s.apoderado2 && s.apoderado2.estado !== 'activo') n++;
     return acc + n;
   }, 0);
 
