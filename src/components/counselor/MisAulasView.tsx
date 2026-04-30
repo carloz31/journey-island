@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Plus, Settings } from 'lucide-react';
+import { Plus, Settings, Copy, KeyRound } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { useToast } from '@/hooks/use-toast';
 import { useClassroom } from '@/contexts/ClassroomContext';
 import { allStudents } from '@/data/counselorMockData';
 import type { CounselorView } from './CounselorLayout';
@@ -15,7 +16,13 @@ interface Props {
 
 const MisAulasView = ({ onViewChange }: Props) => {
   const { allClassrooms } = useClassroom();
+  const { toast } = useToast();
   const [managingClassroomId, setManagingClassroomId] = useState<string | null>(null);
+
+  const copyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    toast({ title: 'Código copiado', description: code });
+  };
 
   if (managingClassroomId) {
     return (
@@ -74,6 +81,19 @@ const MisAulasView = ({ onViewChange }: Props) => {
                     <p className="text-base font-display font-bold text-warning">{inactivos}</p>
                     <p className="text-[10px] text-muted-foreground">Inactivos</p>
                   </div>
+                </div>
+
+                <div className="flex items-center justify-between gap-2 rounded-lg border border-dashed bg-muted/40 px-3 py-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <KeyRound className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-muted-foreground leading-none">Código de acceso</p>
+                      <p className="text-xs font-mono font-semibold truncate">{c.accessCode}</p>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => copyCode(c.accessCode)} title="Copiar código">
+                    <Copy className="w-3.5 h-3.5" />
+                  </Button>
                 </div>
 
                 <div className="space-y-1">
