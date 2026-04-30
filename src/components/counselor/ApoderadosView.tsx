@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Send, Mail } from 'lucide-react';
+import { Search, Mail } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -11,19 +11,12 @@ type ParentRow = {
   key: string;
   nombre: string;
   correo: string;
-  estado: 'activo' | 'pendiente' | 'sin_cuenta';
+  // Activo = tiene cuenta vinculada; Inactivo = aún no se registró con el código
+  activo: boolean;
   ultimoLogin: string | null;
   studentName: string;
   studentId: string;
   classroomId: string;
-};
-
-const stateBadge = (estado: ParentRow['estado']) => {
-  switch (estado) {
-    case 'activo': return <Badge className="bg-success text-white text-[10px] h-5">Activa</Badge>;
-    case 'pendiente': return <Badge className="bg-warning text-white text-[10px] h-5">Pendiente</Badge>;
-    case 'sin_cuenta': return <Badge variant="destructive" className="text-[10px] h-5">Sin cuenta</Badge>;
-  }
 };
 
 const ApoderadosView = () => {
@@ -40,7 +33,7 @@ const ApoderadosView = () => {
       key: `${s.id}-1`,
       nombre: s.apoderado1.nombre,
       correo: s.apoderado1.correo,
-      estado: s.apoderado1.estado,
+      activo: s.apoderado1.estado === 'activo',
       ultimoLogin: s.apoderado1.ultimoLogin,
       studentName: `${s.nombre} ${s.apellido}`,
       studentId: s.id,
@@ -51,7 +44,7 @@ const ApoderadosView = () => {
         key: `${s.id}-2`,
         nombre: s.apoderado2.nombre,
         correo: s.apoderado2.correo,
-        estado: s.apoderado2.estado,
+        activo: s.apoderado2.estado === 'activo',
         ultimoLogin: s.apoderado2.ultimoLogin,
         studentName: `${s.nombre} ${s.apellido}`,
         studentId: s.id,
@@ -62,21 +55,23 @@ const ApoderadosView = () => {
 
   const filtered = rows.filter(r => {
     const matchSearch = `${r.nombre} ${r.studentName} ${r.correo}`.toLowerCase().includes(search.toLowerCase());
-    const matchEstado = estadoFilter === 'all' || r.estado === estadoFilter;
+    const matchEstado = estadoFilter === 'all' || (estadoFilter === 'activo' ? r.activo : !r.activo);
     const matchClassroom = classroomFilter === 'all' || r.classroomId === classroomFilter;
     return matchSearch && matchEstado && matchClassroom;
   });
 
-  const sinCuenta = filtered.filter(r => r.estado === 'sin_cuenta').length;
-  const pendientes = filtered.filter(r => r.estado === 'pendiente').length;
-  const activos = filtered.filter(r => r.estado === 'activo').length;
+  const activos = filtered.filter(r => r.activo).length;
+  const inactivos = filtered.length - activos;
 
   return (
     <div className="p-6 space-y-6 max-w-[1600px] mx-auto">
       <div>
         <h1 className="text-2xl font-display font-bold">Apoderados</h1>
         <p className="text-sm text-muted-foreground">
-          {filtered.length} apoderados · {activos} activos · {pendientes} pendientes · {sinCuenta} sin cuenta
+          {filtered.length} apoderados · {activos} activos · {inactivos} sin cuenta vinculada
+        </p>
+        <p className="text-[11px] text-muted-foreground mt-1">
+          Los apoderados se registran por su cuenta usando el código de acceso del aula del estudiante.
         </p>
       </div>
 
@@ -99,11 +94,9 @@ const ApoderadosView = () => {
           <SelectContent>
             <SelectItem value="all">Todos los estados</SelectItem>
             <SelectItem value="activo">Activos</SelectItem>
-            <SelectItem value="pendiente">Pendientes</SelectItem>
-            <SelectItem value="sin_cuenta">Sin cuenta</SelectItem>
+            <SelectItem value="inactivo">Inactivos</SelectItem>
           </SelectContent>
         </Select>
-        <Button variant="outline" className="gap-2"><Send className="w-4 h-4" />Reenviar pendientes</Button>
       </div>
 
       <div className="rounded-lg border bg-card shadow-sm">
@@ -116,25 +109,30 @@ const ApoderadosView = () => {
               <TableHead>Aula</TableHead>
               <TableHead>Último acceso</TableHead>
               <TableHead className="text-center">Estado</TableHead>
-              <TableHead className="w-24">Acciones</TableHead>
+              <TableHead className="w-20">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filtered.length > 0 ? filtered.map(r => (
               <TableRow key={r.key}>
                 <TableCell className="font-medium text-sm">{r.nombre}</TableCell>
-                <TableCell className="text-xs text-muted-foreground">{r.correo}</TableCell>
+                <TableCell className="text-xs text-muted-foreground">{r.activo ? r.correo : '—'}</TableCell>
                 <TableCell className="text-sm">{r.studentName}</TableCell>
                 <TableCell className="text-xs text-muted-foreground">{classroomById[r.classroomId]}</TableCell>
                 <TableCell className="text-xs text-muted-foreground">{r.ultimoLogin ?? '—'}</TableCell>
-                <TableCell className="text-center">{stateBadge(r.estado)}</TableCell>
+                <TableCell className="text-center">
+                  {r.activo ? (
+                    <Badge className="bg-success text-white text-[10px] h-5">Activo</Badge>
+                  ) : (
+                    <Badge variant="outline" className="text-[10px] h-5">Inactivo</Badge>
+                  )}
+                </TableCell>
                 <TableCell>
-                  <div className="flex gap-1">
-                    <Button variant="ghost" size="icon" className="h-7 w-7" title="Enviar correo"><Mail className="w-3.5 h-3.5" /></Button>
-                    {r.estado !== 'activo' && (
-                      <Button variant="ghost" size="icon" className="h-7 w-7" title="Reenviar invitación"><Send className="w-3.5 h-3.5" /></Button>
-                    )}
-                  </div>
+                  {r.activo && (
+                    <Button variant="ghost" size="icon" className="h-7 w-7" title="Enviar correo">
+                      <Mail className="w-3.5 h-3.5" />
+                    </Button>
+                  )}
                 </TableCell>
               </TableRow>
             )) : (
