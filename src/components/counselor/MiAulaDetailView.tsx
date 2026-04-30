@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { ChevronRight, Send, Users, GraduationCap, UserSquare2, AlertTriangle } from 'lucide-react';
+import { ChevronRight, Send, Users, GraduationCap, UserSquare2, AlertTriangle, Copy, RefreshCw, KeyRound } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
@@ -28,13 +29,27 @@ const MiAulaDetailView = ({ classroomId, onBack, onViewChange }: Props) => {
   const apoderadosCount = classStudents.reduce((acc, s) => acc + 1 + (s.apoderado2 ? 1 : 0), 0);
   const apoderadosSinCuenta = classStudents.reduce((acc, s) => {
     let n = 0;
-    if (s.apoderado1.estado === 'sin_cuenta') n++;
-    if (s.apoderado2 && s.apoderado2.estado === 'sin_cuenta') n++;
+    if (s.apoderado1.estado !== 'activo') n++;
+    if (s.apoderado2 && s.apoderado2.estado !== 'activo') n++;
     return acc + n;
   }, 0);
 
   const [nombre, setNombre] = useState(classroom.nombre);
   const [anio, setAnio] = useState(classroom.anioAcademico);
+  const [accessCode, setAccessCode] = useState(classroom.accessCode);
+  const { toast } = useToast();
+
+  const copyCode = () => {
+    navigator.clipboard.writeText(accessCode);
+    toast({ title: 'Código copiado', description: accessCode });
+  };
+
+  const regenerateCode = () => {
+    const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
+    const newCode = `AULA-${classroom.anioAcademico.slice(-2)}-${rand}`;
+    setAccessCode(newCode);
+    toast({ title: 'Nuevo código generado', description: 'Comparte el nuevo código con tus estudiantes y apoderados.' });
+  };
 
   return (
     <div className="p-6 space-y-6 max-w-[1200px] mx-auto">
@@ -131,6 +146,42 @@ const MiAulaDetailView = ({ classroomId, onBack, onViewChange }: Props) => {
               <Input id="aula-anio" value={anio} onChange={e => setAnio(e.target.value)} />
             </div>
           </div>
+
+          <div className="rounded-lg border border-dashed bg-muted/40 p-4 space-y-2">
+            <div className="flex items-center gap-2">
+              <KeyRound className="w-4 h-4 text-primary" />
+              <Label className="text-xs font-semibold">Código de acceso del aula</Label>
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              Estudiantes y apoderados se registran ingresando este código. Mantenlo seguro y compártelo solo con los miembros del aula.
+            </p>
+            <div className="flex items-center gap-2">
+              <Input value={accessCode} readOnly className="font-mono font-semibold text-sm bg-card" />
+              <Button variant="outline" size="sm" className="gap-1.5 shrink-0" onClick={copyCode}>
+                <Copy className="w-3.5 h-3.5" />Copiar
+              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-1.5 shrink-0">
+                    <RefreshCw className="w-3.5 h-3.5" />Regenerar
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>¿Regenerar el código de acceso?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      El código anterior dejará de funcionar. Los estudiantes y apoderados que aún no se han registrado deberán usar el nuevo código. Las cuentas ya vinculadas no se verán afectadas.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={regenerateCode}>Regenerar código</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          </div>
+
           <div className="flex justify-end gap-2">
             <Button variant="outline" size="sm">Cancelar</Button>
             <Button size="sm">Guardar cambios</Button>
