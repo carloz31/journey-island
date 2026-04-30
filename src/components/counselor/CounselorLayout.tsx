@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  LayoutDashboard, School, Users, ClipboardList, MessageSquare,
+  LayoutDashboard, School, Users, UserSquare2, GraduationCap, ClipboardList, MessageSquare,
   FileBarChart, Settings, ChevronLeft, ChevronRight, LogOut,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -9,14 +9,15 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { counselorProfile } from '@/data/counselorMockData';
 import { useNavigate } from 'react-router-dom';
-import ClassroomSelector from './ClassroomSelector';
 
-export type CounselorView = 'dashboard' | 'aulas' | 'estudiantes' | 'actividades' | 'mensajeria' | 'informes' | 'configuracion';
+export type CounselorView = 'dashboard' | 'aulas' | 'estudiantes' | 'apoderados' | 'docentes' | 'actividades' | 'mensajeria' | 'informes' | 'configuracion';
 
 const navItems: { key: CounselorView; label: string; icon: React.ElementType }[] = [
   { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { key: 'aulas', label: 'Mis Aulas', icon: School },
   { key: 'estudiantes', label: 'Estudiantes', icon: Users },
+  { key: 'apoderados', label: 'Apoderados', icon: UserSquare2 },
+  { key: 'docentes', label: 'Docentes', icon: GraduationCap },
   { key: 'actividades', label: 'Actividades y Plan', icon: ClipboardList },
   { key: 'mensajeria', label: 'Mensajería', icon: MessageSquare },
   { key: 'informes', label: 'Informes', icon: FileBarChart },
