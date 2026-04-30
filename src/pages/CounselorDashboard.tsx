@@ -5,6 +5,8 @@ import CounselorLayout, { type CounselorView } from '@/components/counselor/Coun
 import DashboardView from '@/components/counselor/DashboardView';
 import MisAulasView from '@/components/counselor/MisAulasView';
 import EstudiantesView from '@/components/counselor/EstudiantesView';
+import ApoderadosView from '@/components/counselor/ApoderadosView';
+import DocentesView from '@/components/counselor/DocentesView';
 import ActividadesView from '@/components/counselor/ActividadesView';
 import MensajeriaView from '@/components/counselor/MensajeriaView';
 import InformesView from '@/components/counselor/InformesView';
