@@ -4,7 +4,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { CheckCircle2, Circle, Clock, BookOpen, Heart } from 'lucide-react';
+import { CheckCircle2, Circle, Clock, BookOpen, Heart, TrendingUp } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useNavigate } from 'react-router-dom';
 import { parentActivities, interpolateChildName } from '@/data/parentData';
@@ -18,8 +18,25 @@ const ParentActivitiesPage = () => {
   const informational = parentActivities.filter(a => a.category === 'informational');
   const childRelated = parentActivities.filter(a => a.category === 'child_related');
 
+  const infoCompleted = informational.filter(a => isCompleted(a.id, null)).length;
   const childCompleted = childRelated.filter(a => isCompleted(a.id, selectedChildId)).length;
-  const childPending = childRelated.length - childCompleted;
+
+  // Overall progress = informational (once) + child-related across all children
+  const totalUnits = informational.length + childRelated.length * profile.children.length;
+  const completedUnits =
+    infoCompleted +
+    profile.children.reduce(
+      (sum, c) => sum + childRelated.filter(a => isCompleted(a.id, c.id)).length,
+      0
+    );
+  const overallPct = totalUnits > 0 ? Math.round((completedUnits / totalUnits) * 100) : 0;
+
+  const progressTone =
+    overallPct >= 75
+      ? 'bg-success/15 text-success border-success/30'
+      : overallPct >= 40
+      ? 'bg-warning/15 text-warning border-warning/30'
+      : 'bg-destructive/15 text-destructive border-destructive/30';
 
   const renderAccordion = (activities: typeof parentActivities, childId: string | null) => (
     <Accordion type="single" collapsible className="space-y-3">
@@ -79,17 +96,36 @@ const ParentActivitiesPage = () => {
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-display font-bold mb-1">Actividades para padres</h1>
-        <p className="text-sm text-muted-foreground">
-          Reflexiona y acompaña el proceso vocacional de tu hijo/a.
-        </p>
+      <div className="mb-6 flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-display font-bold mb-1">Actividades para padres</h1>
+          <p className="text-sm text-muted-foreground">
+            Reflexiona y acompaña el proceso vocacional de tu hijo/a.
+          </p>
+        </div>
+        <div className={`flex items-center gap-3 rounded-xl border px-4 py-3 ${progressTone}`}>
+          <TrendingUp className="w-5 h-5" />
+          <div>
+            <p className="text-[10px] uppercase tracking-wider opacity-80 leading-none">Progreso general</p>
+            <p className="text-2xl font-display font-bold leading-tight">{overallPct}%</p>
+          </div>
+        </div>
       </div>
 
       <Tabs value={tab} onValueChange={v => setTab(v as 'info' | 'child')} className="w-full">
         <TabsList className="grid w-full grid-cols-2 max-w-md">
-          <TabsTrigger value="info">Actividades Informativas</TabsTrigger>
-          <TabsTrigger value="child">Actividades por Hijo/a</TabsTrigger>
+          <TabsTrigger value="info" className="gap-2">
+            <span>Actividades Informativas</span>
+            <span className="text-[11px] tabular-nums text-muted-foreground data-[state=active]:text-foreground/70">
+              {infoCompleted}/{informational.length}
+            </span>
+          </TabsTrigger>
+          <TabsTrigger value="child" className="gap-2">
+            <span>Actividades por Hijo/a</span>
+            <span className="text-[11px] tabular-nums text-muted-foreground">
+              {childCompleted}/{childRelated.length}
+            </span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="info" className="mt-6">
@@ -118,22 +154,6 @@ const ParentActivitiesPage = () => {
                 </Select>
               )}
             </div>
-          </div>
-
-          {/* Metrics */}
-          <div className="grid grid-cols-3 gap-3 mb-6">
-            <Card className="p-4">
-              <p className="text-xs text-muted-foreground">Disponibles</p>
-              <p className="text-2xl font-display font-bold mt-1">{childRelated.length}</p>
-            </Card>
-            <Card className="p-4">
-              <p className="text-xs text-muted-foreground">Completadas</p>
-              <p className="text-2xl font-display font-bold mt-1 text-success">{childCompleted}</p>
-            </Card>
-            <Card className="p-4">
-              <p className="text-xs text-muted-foreground">Pendientes</p>
-              <p className="text-2xl font-display font-bold mt-1 text-warning">{childPending}</p>
-            </Card>
           </div>
 
           {renderAccordion(childRelated, selectedChildId)}
