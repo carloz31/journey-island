@@ -1,12 +1,13 @@
-import { Users, Activity, AlertTriangle, UserX, Clock, ChevronDown, ChevronUp, Send, Eye } from 'lucide-react';
+import { Users, Activity, AlertTriangle, UserX, Clock, ChevronDown, ChevronUp, Send } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useClassroom } from '@/contexts/ClassroomContext';
 import { recentActions } from '@/data/counselorMockData';
 
@@ -29,61 +30,91 @@ const KpiCard = ({ icon: Icon, label, value, color, subtitle }: { icon: React.El
 const heatmapColors = ['hsl(var(--muted))', 'hsl(187 52% 85%)', 'hsl(187 52% 70%)', 'hsl(187 52% 55%)', 'hsl(187 52% 40%)'];
 const dayLabels = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 
+const aggregateDistribution = (lists: { name: string; value: number; fill: string }[][]) => {
+  const map = new Map<string, { name: string; value: number; fill: string }>();
+  lists.flat().forEach(item => {
+    const existing = map.get(item.name);
+    if (existing) existing.value += item.value;
+    else map.set(item.name, { ...item });
+  });
+  return Array.from(map.values());
+};
+
+const aggregateCareer = (lists: { area: string; count: number }[][]) => {
+  const map = new Map<string, number>();
+  lists.flat().forEach(({ area, count }) => map.set(area, (map.get(area) ?? 0) + count));
+  return Array.from(map.entries()).map(([area, count]) => ({ area, count })).sort((a, b) => b.count - a.count);
+};
+
+const aggregateBlocks = (lists: { nombre: string; pct: number }[][]) => {
+  const map = new Map<string, { sum: number; n: number }>();
+  lists.flat().forEach(({ nombre, pct }) => {
+    const cur = map.get(nombre) ?? { sum: 0, n: 0 };
+    map.set(nombre, { sum: cur.sum + pct, n: cur.n + 1 });
+  });
+  return Array.from(map.entries()).map(([nombre, { sum, n }]) => ({ nombre, pct: Math.round(sum / n) }));
+};
+
+const aggregateHeatmap = (lists: number[][][]) => {
+  if (lists.length === 0) return [] as number[][];
+  const weeks = lists[0].length;
+  const days = lists[0][0].length;
+  const out: number[][] = Array.from({ length: weeks }, () => Array(days).fill(0));
+  lists.forEach(hm => hm.forEach((week, wi) => week.forEach((v, di) => { out[wi][di] += v; })));
+  return out.map(week => week.map(v => Math.min(4, Math.round(v / lists.length))));
+};
+
 const DashboardView = () => {
   const [alertsOpen, setAlertsOpen] = useState(true);
-  const { currentClassroom, currentStudents, allClassrooms, setCurrentClassroomId } = useClassroom();
+  const { allClassrooms, allStudents } = useClassroom();
+  const [scope, setScope] = useState<string>('all');
 
-  const atRisk = currentStudents.filter(s => s.riesgo);
-  const noAccountParents = currentStudents.filter(s => s.apoderado1.estado === 'sin_cuenta' || s.apoderado2?.estado === 'sin_cuenta');
-  const avgCompletion = currentStudents.length > 0 ? Math.round(currentStudents.reduce((a, s) => a + s.porcentajeCompletado, 0) / currentStudents.length) : 0;
-  const activeCount = currentStudents.filter(s => s.estado === 'activo').length;
-  const classroomActions = recentActions.filter(a => a.classroomId === currentClassroom.id);
+  const isAll = scope === 'all';
+  const classroomsInScope = isAll ? allClassrooms : allClassrooms.filter(c => c.id === scope);
+  const studentsInScope = isAll ? allStudents : allStudents.filter(s => s.classroomId === scope);
+  const scopeLabel = isAll ? 'Todas las aulas' : (classroomsInScope[0]?.nombre ?? '—');
+
+  const totalStudents = classroomsInScope.reduce((a, c) => a + c.totalEstudiantes, 0);
+  const atRisk = studentsInScope.filter(s => s.riesgo);
+  const noAccountParents = studentsInScope.filter(s => s.apoderado1.estado === 'sin_cuenta' || s.apoderado2?.estado === 'sin_cuenta');
+  const avgCompletion = studentsInScope.length > 0
+    ? Math.round(studentsInScope.reduce((a, s) => a + s.porcentajeCompletado, 0) / studentsInScope.length)
+    : 0;
+  const activeCount = studentsInScope.filter(s => s.estado === 'activo').length;
+
+  const careerInterests = useMemo(() => aggregateCareer(classroomsInScope.map(c => c.careerInterests)), [classroomsInScope]);
+  const hollandDistribution = useMemo(() => aggregateDistribution(classroomsInScope.map(c => c.hollandDistribution)), [classroomsInScope]);
+  const learningStylesDistribution = useMemo(() => aggregateDistribution(classroomsInScope.map(c => c.learningStylesDistribution)), [classroomsInScope]);
+  const bloquesProgress = useMemo(() => aggregateBlocks(classroomsInScope.map(c => c.bloquesProgress)), [classroomsInScope]);
+  const heatmap = useMemo(() => aggregateHeatmap(classroomsInScope.map(c => c.weeklyHeatmap)), [classroomsInScope]);
+
+  const scopedActions = isAll ? recentActions : recentActions.filter(a => a.classroomId === scope);
 
   return (
     <div className="p-6 space-y-6 max-w-[1600px] mx-auto">
-      <div>
-        <h1 className="text-2xl font-display font-bold">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Viendo: {currentClassroom.nombre}</p>
+      <div className="flex items-end justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-display font-bold">Dashboard</h1>
+          <p className="text-sm text-muted-foreground">Viendo: {scopeLabel}</p>
+        </div>
+        <Select value={scope} onValueChange={setScope}>
+          <SelectTrigger className="w-64"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todas las aulas</SelectItem>
+            {allClassrooms.map(c => (
+              <SelectItem key={c.id} value={c.id}>{c.nombre}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-4 gap-4">
-        <KpiCard icon={Users} label="Total Estudiantes" value={currentClassroom.totalEstudiantes} color="bg-primary" subtitle={`${activeCount} activos`} />
+        <KpiCard icon={Users} label="Total Estudiantes" value={totalStudents} color="bg-primary" subtitle={`${activeCount} activos`} />
         <KpiCard icon={Activity} label="Actividad Promedio" value={`${avgCompletion}%`} color="bg-secondary" subtitle="del plan completado" />
         <KpiCard icon={AlertTriangle} label="Estudiantes en Riesgo" value={atRisk.length} color="bg-destructive" subtitle="7+ días sin actividad" />
         <KpiCard icon={UserX} label="Apoderados sin cuenta" value={noAccountParents.length} color="bg-warning" subtitle="cuentas no activadas" />
       </div>
-
-      {/* Resumen Mis Aulas */}
-      <Card>
-        <CardHeader className="py-3 px-5">
-          <CardTitle className="text-sm font-display">Resumen de Mis Aulas</CardTitle>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {allClassrooms.map(c => {
-              const healthColor = c.health === 'green' ? 'bg-success' : c.health === 'yellow' ? 'bg-warning' : 'bg-destructive';
-              return (
-                <div key={c.id} className="flex items-center gap-3 rounded-lg border p-3">
-                  <div className={`w-2.5 h-2.5 rounded-full ${healthColor} shrink-0`} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{c.nombre}</p>
-                    <p className="text-[10px] text-muted-foreground">{c.totalEstudiantes} est. · {c.completionPct}% · {c.atRiskCount} en riesgo</p>
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="h-7 text-xs gap-1"
-                    onClick={() => setCurrentClassroomId(c.id)}
-                  >
-                    <Eye className="w-3 h-3" />Ver
-                  </Button>
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Alerts */}
       <Collapsible open={alertsOpen} onOpenChange={setAlertsOpen}>
@@ -132,10 +163,10 @@ const DashboardView = () => {
       {/* Classroom Progress */}
       <Card>
         <CardHeader className="py-3 px-5">
-          <CardTitle className="text-sm font-display">Progreso del Aula por Bloque</CardTitle>
+          <CardTitle className="text-sm font-display">Progreso {isAll ? 'agregado' : 'del aula'} por bloque</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 pt-0">
-          {currentClassroom.bloquesProgress.map(b => (
+          {bloquesProgress.map(b => (
             <div key={b.nombre} className="flex items-center gap-4">
               <span className="text-xs w-48 shrink-0 text-muted-foreground">{b.nombre}</span>
               <Progress value={b.pct} className="h-3 flex-1" />
@@ -151,7 +182,7 @@ const DashboardView = () => {
           <CardHeader className="py-3 px-5"><CardTitle className="text-sm font-display">Top Áreas de Interés</CardTitle></CardHeader>
           <CardContent className="pt-0 h-52">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={currentClassroom.careerInterests} layout="vertical" margin={{ left: 0 }}>
+              <BarChart data={careerInterests} layout="vertical" margin={{ left: 0 }}>
                 <XAxis type="number" hide />
                 <YAxis type="category" dataKey="area" width={100} tick={{ fontSize: 11 }} />
                 <Tooltip />
@@ -166,8 +197,8 @@ const DashboardView = () => {
           <CardContent className="pt-0 h-52 flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={currentClassroom.hollandDistribution} dataKey="value" cx="50%" cy="50%" innerRadius={40} outerRadius={70} paddingAngle={3} label={({ name, value }) => `${name} (${value})`} labelLine={false}>
-                  {currentClassroom.hollandDistribution.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
+                <Pie data={hollandDistribution} dataKey="value" cx="50%" cy="50%" innerRadius={40} outerRadius={70} paddingAngle={3} label={({ name, value }) => `${name} (${value})`} labelLine={false}>
+                  {hollandDistribution.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
                 </Pie>
                 <Tooltip />
               </PieChart>
@@ -180,8 +211,8 @@ const DashboardView = () => {
           <CardContent className="pt-0 h-52 flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={currentClassroom.learningStylesDistribution} dataKey="value" cx="50%" cy="50%" innerRadius={40} outerRadius={70} paddingAngle={3} label={({ name, value }) => `${name} (${value})`} labelLine={false}>
-                  {currentClassroom.learningStylesDistribution.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
+                <Pie data={learningStylesDistribution} dataKey="value" cx="50%" cy="50%" innerRadius={40} outerRadius={70} paddingAngle={3} label={({ name, value }) => `${name} (${value})`} labelLine={false}>
+                  {learningStylesDistribution.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
                 </Pie>
                 <Tooltip />
               </PieChart>
@@ -199,7 +230,7 @@ const DashboardView = () => {
               <div className="flex flex-col gap-1 pr-2">
                 {dayLabels.map(d => <div key={d} className="h-5 flex items-center text-[10px] text-muted-foreground">{d}</div>)}
               </div>
-              {currentClassroom.weeklyHeatmap.map((week, wi) => (
+              {heatmap.map((week, wi) => (
                 <div key={wi} className="flex flex-col gap-1">
                   {week.map((val, di) => (
                     <div key={di} className="w-5 h-5 rounded-sm" style={{ backgroundColor: heatmapColors[val] }} title={`Semana ${wi + 1}, ${dayLabels[di]}: nivel ${val}`} />
@@ -220,7 +251,7 @@ const DashboardView = () => {
           <CardContent className="pt-0 flex-1">
             <ScrollArea className="h-[220px]">
               <div className="space-y-3">
-                {classroomActions.map(a => (
+                {scopedActions.map(a => (
                   <div key={a.id} className="flex gap-3">
                     <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />
                     <div>
