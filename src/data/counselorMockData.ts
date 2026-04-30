@@ -80,6 +80,7 @@ export interface Classroom {
   id: string;
   nombre: string;
   anioAcademico: string;
+  accessCode: string;
   totalEstudiantes: number;
   coTutores: number;
   health: 'green' | 'yellow' | 'red';
@@ -226,6 +227,7 @@ export const classrooms: Classroom[] = [
     id: 'c1',
     nombre: '4to Año B — Promoción 2025',
     anioAcademico: '2025',
+    accessCode: 'AULA-4B25-X9KM',
     totalEstudiantes: 28,
     coTutores: 3,
     health: 'yellow',
@@ -273,6 +275,7 @@ export const classrooms: Classroom[] = [
     id: 'c2',
     nombre: '3ro Año A — Promoción 2026',
     anioAcademico: '2026',
+    accessCode: 'AULA-3A26-P7LQ',
     totalEstudiantes: 24,
     coTutores: 2,
     health: 'red',
