@@ -10,6 +10,7 @@ import ActivityPlayer from "./pages/ActivityPlayer.tsx";
 import Messages from "./pages/Messages.tsx";
 import VocationalProfile from "./pages/VocationalProfile.tsx";
 import CounselorDashboard from "./pages/CounselorDashboard.tsx";
+import ParentApp from "./pages/ParentApp.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/profile" element={<VocationalProfile />} />
           <Route path="/counselor" element={<CounselorDashboard />} />
           <Route path="/counselor/student/:studentId" element={<CounselorDashboard />} />
+          <Route path="/parents/*" element={<ParentApp />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
