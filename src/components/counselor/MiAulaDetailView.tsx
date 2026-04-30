@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { ChevronRight, Send, Users, GraduationCap, UserSquare2, AlertTriangle } from 'lucide-react';
+import { ChevronRight, Send, Users, GraduationCap, UserSquare2, AlertTriangle, Copy, RefreshCw, KeyRound } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
@@ -35,6 +36,20 @@ const MiAulaDetailView = ({ classroomId, onBack, onViewChange }: Props) => {
 
   const [nombre, setNombre] = useState(classroom.nombre);
   const [anio, setAnio] = useState(classroom.anioAcademico);
+  const [accessCode, setAccessCode] = useState(classroom.accessCode);
+  const { toast } = useToast();
+
+  const copyCode = () => {
+    navigator.clipboard.writeText(accessCode);
+    toast({ title: 'Código copiado', description: accessCode });
+  };
+
+  const regenerateCode = () => {
+    const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
+    const newCode = `AULA-${classroom.anioAcademico.slice(-2)}-${rand}`;
+    setAccessCode(newCode);
+    toast({ title: 'Nuevo código generado', description: 'Comparte el nuevo código con tus estudiantes y apoderados.' });
+  };
 
   return (
     <div className="p-6 space-y-6 max-w-[1200px] mx-auto">
