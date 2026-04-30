@@ -342,5 +342,5 @@ export const getActivityById = (id: string): ParentActivity | undefined =>
 // Replace [Nombre] tokens
 export const interpolateChildName = (text: string | undefined, name: string): string => {
   if (!text) return '';
-  return text.replaceAll('[Nombre]', name);
+  return text.split('[Nombre]').join(name);
 };
