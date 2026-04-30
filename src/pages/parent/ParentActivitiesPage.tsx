@@ -19,7 +19,14 @@ const ParentActivitiesPage = () => {
   const childRelated = parentActivities.filter(a => a.category === 'child_related');
 
   const infoCompleted = informational.filter(a => isCompleted(a.id, null)).length;
-  const childCompleted = childRelated.filter(a => isCompleted(a.id, selectedChildId)).length;
+  const infoTotal = informational.length;
+
+  // Child-related progress aggregated across ALL children
+  const childTotal = childRelated.length * profile.children.length;
+  const childAllCompleted = profile.children.reduce(
+    (sum, c) => sum + childRelated.filter(a => isCompleted(a.id, c.id)).length,
+    0
+  );
 
   // Overall progress = informational (once) + child-related across all children
   const totalUnits = informational.length + childRelated.length * profile.children.length;
