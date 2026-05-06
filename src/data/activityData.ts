@@ -14,6 +14,14 @@ export interface RpgStep {
   character: string;
   avatar: string;
   text: string;
+  /** Visual ambient for this step. Activity background reacts to it. */
+  ambient?: 'dark' | 'light';
+  /** If set, look up the answer of step at index `branchOn.fromStep` and use
+   *  the matching text from `branchOn.byOption`. Falls back to `text`. */
+  branchOn?: {
+    fromStep: number;
+    byOption: Record<string, string>;
+  };
 }
 
 export interface ContentStep {
