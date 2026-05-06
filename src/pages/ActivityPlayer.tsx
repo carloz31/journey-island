@@ -46,6 +46,28 @@ const ActivityPlayer = () => {
   const currentAnswer = answers[currentStep] ?? {};
   const canAdvance = step.type === 'rpg' ? true : isStepComplete(step, currentAnswer);
 
+  // Mock student name placeholder used by token replacement.
+  const STUDENT_NAME = 'Sofía';
+
+  // Resolve RPG text: optional branching from a previous step's selectedOption,
+  // plus {nombre} token replacement.
+  const resolveRpgText = (s: typeof step): string | undefined => {
+    if (s.type !== 'rpg') return undefined;
+    let text = s.text;
+    if (s.branchOn) {
+      const fromAnswer = answers[s.branchOn.fromStep];
+      const opt = fromAnswer?.selectedOption;
+      if (opt && s.branchOn.byOption[opt]) {
+        text = s.branchOn.byOption[opt];
+      }
+    }
+    return text.replace(/\{nombre\}/g, STUDENT_NAME);
+  };
+
+  // Read ambient ('dark' | 'light') if the step declares it.
+  const ambient: 'dark' | 'light' | undefined =
+    'ambient' in step ? (step as { ambient?: 'dark' | 'light' }).ambient : undefined;
+
   const handleNext = () => {
     if (currentStep < totalSteps - 1) {
       setCurrentStep(prev => prev + 1);
@@ -73,18 +95,30 @@ const ActivityPlayer = () => {
     'dialogue' in step &&
     step.dialogue;
 
+  // Custom submit label (e.g. "Guardar carta") for non-rpg steps.
+  const submitLabel =
+    'submitLabel' in step ? (step as { submitLabel?: string }).submitLabel : undefined;
+
   return (
     <div className="h-screen w-screen flex flex-col overflow-hidden">
-      {/* Background */}
+      {/* Background — reacts to ambient ('dark' = night/lamp, 'light' = sunrise) */}
       <div
-        className="absolute inset-0 z-0"
+        className="absolute inset-0 z-0 transition-[background] duration-[1200ms] ease-in-out"
         style={{
           background: activity.backgroundUrl
             ? `url(${activity.backgroundUrl}) center/cover`
-            : 'linear-gradient(160deg, hsl(var(--primary) / 0.35) 0%, hsl(205 40% 12%) 50%, hsl(var(--accent) / 0.2) 100%)',
+            : ambient === 'light'
+              ? 'radial-gradient(ellipse at 50% 35%, hsl(38 90% 88%) 0%, hsl(28 70% 78%) 35%, hsl(220 30% 70%) 100%)'
+              : ambient === 'dark'
+                ? 'radial-gradient(ellipse at 50% 45%, hsla(40, 80%, 70%, 0.35) 0%, hsl(225 30% 8%) 55%, hsl(225 35% 4%) 100%)'
+                : 'linear-gradient(160deg, hsl(var(--primary) / 0.35) 0%, hsl(205 40% 12%) 50%, hsl(var(--accent) / 0.2) 100%)',
         }}
       />
-      <div className="absolute inset-0 z-[1] bg-foreground/30" />
+      <div
+        className={`absolute inset-0 z-[1] transition-colors duration-[1200ms] ${
+          ambient === 'light' ? 'bg-background/10' : 'bg-foreground/30'
+        }`}
+      />
 
       {/* Top bar */}
       <header
@@ -150,7 +184,14 @@ const ActivityPlayer = () => {
             </motion.div>
           ) : step.type === 'rpg' ? (
             <motion.div key={`rpg-${currentStep}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <RpgDialogueStep step={step} onNext={handleNext} onBack={handleBack} isFirst={currentStep === 0} isLast={currentStep === totalSteps - 1} />
+              <RpgDialogueStep
+                step={step}
+                resolvedText={resolveRpgText(step)}
+                onNext={handleNext}
+                onBack={handleBack}
+                isFirst={currentStep === 0}
+                isLast={currentStep === totalSteps - 1}
+              />
             </motion.div>
           ) : (
             <motion.div
@@ -196,7 +237,9 @@ const ActivityPlayer = () => {
                       bg-accent text-accent-foreground hover:brightness-110 active:scale-95
                       disabled:opacity-40 disabled:pointer-events-none"
                   >
-                    {currentStep === totalSteps - 1 ? '✨ Finalizar' : 'Siguiente ▸'}
+                    {currentStep === totalSteps - 1
+                      ? '✨ Finalizar'
+                      : submitLabel ?? 'Siguiente ▸'}
                   </button>
                 </div>
               </div>

@@ -8,9 +8,12 @@ interface Props {
   onBack?: () => void;
   isFirst: boolean;
   isLast: boolean;
+  /** Resolved text override (branched + token-replaced). Takes precedence over step.text. */
+  resolvedText?: string;
 }
 
-const RpgDialogueStep = ({ step, onNext, onBack, isFirst, isLast }: Props) => {
+const RpgDialogueStep = ({ step, onNext, onBack, isFirst, isLast, resolvedText }: Props) => {
+  const text = resolvedText ?? step.text;
   const [displayedText, setDisplayedText] = useState('');
   const [done, setDone] = useState(false);
 
@@ -20,18 +23,18 @@ const RpgDialogueStep = ({ step, onNext, onBack, isFirst, isLast }: Props) => {
     let i = 0;
     const id = setInterval(() => {
       i++;
-      setDisplayedText(step.text.slice(0, i));
-      if (i >= step.text.length) {
+      setDisplayedText(text.slice(0, i));
+      if (i >= text.length) {
         clearInterval(id);
         setDone(true);
       }
     }, 12);
     return () => clearInterval(id);
-  }, [step.text]);
+  }, [text]);
 
   const handleClick = () => {
     if (!done) {
-      setDisplayedText(step.text);
+      setDisplayedText(text);
       setDone(true);
     } else {
       onNext();

@@ -14,6 +14,14 @@ export interface RpgStep {
   character: string;
   avatar: string;
   text: string;
+  /** Visual ambient for this step. Activity background reacts to it. */
+  ambient?: 'dark' | 'light';
+  /** If set, look up the answer of step at index `branchOn.fromStep` and use
+   *  the matching text from `branchOn.byOption`. Falls back to `text`. */
+  branchOn?: {
+    fromStep: number;
+    byOption: Record<string, string>;
+  };
 }
 
 export interface ContentStep {
@@ -35,6 +43,16 @@ export interface OpenQuestionStep {
   placeholder?: string;
   maxLength?: number;
   required?: boolean;
+  /** Optional list of suggestion prompts shown under the textarea. */
+  subQuestions?: string[];
+  /** Optional small note shown below the sub-questions. */
+  note?: string;
+  /** Hide character counter even if maxLength is set. */
+  hideCounter?: boolean;
+  /** Visual ambient for this step. */
+  ambient?: 'dark' | 'light';
+  /** Custom label for the next/save button. */
+  submitLabel?: string;
   withDialogue?: boolean;
   dialogue?: { character: string; avatar: string; text: string };
 }
@@ -123,37 +141,139 @@ export const activitiesMap: Record<string, Activity> = {
   'act-sk1': {
     id: 'act-sk1',
     nodeId: 'sk1',
-    title: 'Bienvenido al viaje',
+    title: 'Bienvenida al viaje',
     pointsReward: 10,
     steps: [
       {
         type: 'rpg',
         character: 'Pepe',
         avatar: '🐒',
-        text: '¡Hola, aventurero! Soy Pepe y seré tu compañero durante todo este viaje vocacional. 🌟',
+        ambient: 'dark',
+        text: 'Hola, {nombre}. Soy Pepe.',
       },
       {
         type: 'rpg',
         character: 'Pepe',
         avatar: '🐒',
-        text: 'Estás a punto de emprender un recorrido que te ayudará a conocerte mejor y a descubrir caminos que quizás nunca habías imaginado.',
+        ambient: 'dark',
+        text: 'Antes de empezar cualquier cosa, quiero que sepas algo: este programa no está diseñado para decirte qué estudiar. Eso lo vas a decidir tú. Lo que sí vamos a hacer juntos es que esa decisión sea tuya de verdad — no la de tus papás, no la de tus amigos, no la de nadie más.',
       },
       {
-        type: 'content',
-        title: '¿Qué es la orientación vocacional?',
-        body: 'Es un proceso que te ayuda a descubrir tus intereses, habilidades y valores para tomar decisiones informadas sobre tu futuro académico y profesional.',
-        withDialogue: true,
-        dialogue: {
-          character: 'Pepe',
-          avatar: '🐒',
-          text: 'Mira esta información importante antes de continuar. 📖',
+        type: 'rpg',
+        character: 'Pepe',
+        avatar: '🐒',
+        ambient: 'dark',
+        text: "Salir del colegio es una de esas cosas que parece que está lejos hasta que de repente está encima. Y en algún momento alguien te va a preguntar — si es que no lo ha hecho ya — '¿y tú qué vas a hacer cuando termines?'",
+      },
+      {
+        type: 'multiple_choice',
+        question: '¿Qué sientes cuando te hacen esa pregunta?',
+        mode: 'free',
+        layout: 'list',
+        options: [
+          { id: 'emocion', label: 'Me emociona, tengo ganas de lo que viene' },
+          { id: 'presion', label: 'Me genera presión o ansiedad' },
+          { id: 'mixto', label: 'Me da un poco de todo — ilusión y miedo a la vez' },
+          { id: 'no_pensado', label: 'La verdad, todavía no me he puesto a pensarlo' },
+        ],
+      },
+      {
+        type: 'rpg',
+        character: 'Pepe',
+        avatar: '🐒',
+        ambient: 'dark',
+        text: 'Gracias por contarme.',
+        branchOn: {
+          fromStep: 3,
+          byOption: {
+            emocion:
+              'Me alegra escuchar eso. Que llegues con ganas es un buen punto de partida. En este viaje vamos a asegurarnos de que esas ganas estén bien fundamentadas.',
+            presion:
+              'Tiene sentido. Es una pregunta que carga demasiado para hacerse así, de golpe. La buena noticia es que en este viaje vamos a desmontarla poco a poco.',
+            mixto:
+              'Eso es más honesto de lo que parece. Ilusión y miedo juntos casi siempre significan que algo importante está pasando.',
+            no_pensado:
+              'Perfecto punto de partida. Mejor empezar sabiendo que no se sabe, que creyendo que ya se tiene todo claro.',
+          },
         },
       },
       {
         type: 'rpg',
         character: 'Pepe',
         avatar: '🐒',
-        text: 'Recuerda: no hay respuestas incorrectas. Este camino es tuyo y lo que descubras aquí será valioso para tu futuro. ¡Vamos! 🚀',
+        ambient: 'dark',
+        text: 'Este programa dura varias semanas. No te voy a pedir que decidas nada hoy.',
+      },
+      {
+        type: 'rpg',
+        character: 'Pepe',
+        avatar: '🐒',
+        ambient: 'dark',
+        text: 'Lo que sí te voy a pedir ahora mismo es una sola cosa.',
+      },
+      {
+        type: 'rpg',
+        character: 'Pepe',
+        avatar: '🐒',
+        ambient: 'dark',
+        text: 'Quiero que le escribas una carta a la versión de ti que va a leer esto al final del programa — dentro de unas semanas, cuando el viaje haya terminado.',
+      },
+      {
+        type: 'rpg',
+        character: 'Pepe',
+        avatar: '🐒',
+        ambient: 'dark',
+        text: 'Esa versión futura tuya va a haber pensado un montón de cosas sobre su futuro. Pero todavía no sabe nada de eso. Tú, en cambio, estás justo aquí — al inicio, con todo lo que sientes hoy. Eso tiene valor.',
+      },
+      {
+        type: 'rpg',
+        character: 'Pepe',
+        avatar: '🐒',
+        ambient: 'dark',
+        text: 'Esta carta no la voy a leer yo. No la va a leer tu psicóloga ni tus papás. La vas a leer tú, y solo tú, cuando lleguemos al final.',
+      },
+      {
+        type: 'open_question',
+        question: 'Carta para mí — {today}',
+        placeholder: 'Empieza a escribir aquí... esta carta es solo para ti.',
+        required: true,
+        ambient: 'light',
+        hideCounter: true,
+        submitLabel: 'Guardar carta',
+        subQuestions: [
+          '¿Cómo te sientes hoy frente al hecho de que el colegio está terminando?',
+          '¿Sientes que estás preparado para tomar una decisión sobre tu futuro? ¿Por qué sí o por qué no?',
+          '¿Qué te gustaría que la versión de ti del futuro recordara sobre cómo te sientes hoy?',
+        ],
+        note: 'No tienes que responder las tres. Son solo puntos de partida por si no sabes por dónde empezar. La carta es tuya — escribe lo que quieras.',
+      },
+      {
+        type: 'rpg',
+        character: 'Pepe',
+        avatar: '🐒',
+        ambient: 'light',
+        text: 'Guardada. Nadie más la va a ver.',
+      },
+      {
+        type: 'rpg',
+        character: 'Pepe',
+        avatar: '🐒',
+        ambient: 'light',
+        text: 'Lo que acabas de escribir me dice algo sobre desde dónde partes. Y cuando lleguemos al final del viaje, tú mismo vas a poder ver cuánto cambió — o cuánto no.',
+      },
+      {
+        type: 'rpg',
+        character: 'Pepe',
+        avatar: '🐒',
+        ambient: 'light',
+        text: 'La siguiente parte del viaje es tomar algo que llamamos la Foto del Punto de Partida. Es un diagnóstico — nada de exámenes, ninguna respuesta correcta. Solo una imagen de cómo llegas hoy.',
+      },
+      {
+        type: 'rpg',
+        character: 'Pepe',
+        avatar: '🐒',
+        ambient: 'light',
+        text: 'Cuando quieras, nos vemos ahí.',
       },
     ],
   },
