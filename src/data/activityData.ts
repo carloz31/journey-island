@@ -43,6 +43,16 @@ export interface OpenQuestionStep {
   placeholder?: string;
   maxLength?: number;
   required?: boolean;
+  /** Optional list of suggestion prompts shown under the textarea. */
+  subQuestions?: string[];
+  /** Optional small note shown below the sub-questions. */
+  note?: string;
+  /** Hide character counter even if maxLength is set. */
+  hideCounter?: boolean;
+  /** Visual ambient for this step. */
+  ambient?: 'dark' | 'light';
+  /** Custom label for the next/save button. */
+  submitLabel?: string;
   withDialogue?: boolean;
   dialogue?: { character: string; avatar: string; text: string };
 }
