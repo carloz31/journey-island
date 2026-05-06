@@ -8,9 +8,12 @@ interface Props {
   onBack?: () => void;
   isFirst: boolean;
   isLast: boolean;
+  /** Resolved text override (branched + token-replaced). Takes precedence over step.text. */
+  resolvedText?: string;
 }
 
-const RpgDialogueStep = ({ step, onNext, onBack, isFirst, isLast }: Props) => {
+const RpgDialogueStep = ({ step, onNext, onBack, isFirst, isLast, resolvedText }: Props) => {
+  const text = resolvedText ?? step.text;
   const [displayedText, setDisplayedText] = useState('');
   const [done, setDone] = useState(false);
 
