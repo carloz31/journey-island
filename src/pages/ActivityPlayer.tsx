@@ -184,7 +184,14 @@ const ActivityPlayer = () => {
             </motion.div>
           ) : step.type === 'rpg' ? (
             <motion.div key={`rpg-${currentStep}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <RpgDialogueStep step={step} onNext={handleNext} onBack={handleBack} isFirst={currentStep === 0} isLast={currentStep === totalSteps - 1} />
+              <RpgDialogueStep
+                step={step}
+                resolvedText={resolveRpgText(step)}
+                onNext={handleNext}
+                onBack={handleBack}
+                isFirst={currentStep === 0}
+                isLast={currentStep === totalSteps - 1}
+              />
             </motion.div>
           ) : (
             <motion.div
