@@ -46,6 +46,28 @@ const ActivityPlayer = () => {
   const currentAnswer = answers[currentStep] ?? {};
   const canAdvance = step.type === 'rpg' ? true : isStepComplete(step, currentAnswer);
 
+  // Mock student name placeholder used by token replacement.
+  const STUDENT_NAME = 'Sofía';
+
+  // Resolve RPG text: optional branching from a previous step's selectedOption,
+  // plus {nombre} token replacement.
+  const resolveRpgText = (s: typeof step): string | undefined => {
+    if (s.type !== 'rpg') return undefined;
+    let text = s.text;
+    if (s.branchOn) {
+      const fromAnswer = answers[s.branchOn.fromStep];
+      const opt = fromAnswer?.selectedOption;
+      if (opt && s.branchOn.byOption[opt]) {
+        text = s.branchOn.byOption[opt];
+      }
+    }
+    return text.replace(/\{nombre\}/g, STUDENT_NAME);
+  };
+
+  // Read ambient ('dark' | 'light') if the step declares it.
+  const ambient: 'dark' | 'light' | undefined =
+    'ambient' in step ? (step as { ambient?: 'dark' | 'light' }).ambient : undefined;
+
   const handleNext = () => {
     if (currentStep < totalSteps - 1) {
       setCurrentStep(prev => prev + 1);
@@ -72,6 +94,10 @@ const ActivityPlayer = () => {
     step.withDialogue &&
     'dialogue' in step &&
     step.dialogue;
+
+  // Custom submit label (e.g. "Guardar carta") for non-rpg steps.
+  const submitLabel =
+    'submitLabel' in step ? (step as { submitLabel?: string }).submitLabel : undefined;
 
   return (
     <div className="h-screen w-screen flex flex-col overflow-hidden">
