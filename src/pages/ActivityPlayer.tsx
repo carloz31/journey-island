@@ -101,16 +101,24 @@ const ActivityPlayer = () => {
 
   return (
     <div className="h-screen w-screen flex flex-col overflow-hidden">
-      {/* Background */}
+      {/* Background — reacts to ambient ('dark' = night/lamp, 'light' = sunrise) */}
       <div
-        className="absolute inset-0 z-0"
+        className="absolute inset-0 z-0 transition-[background] duration-[1200ms] ease-in-out"
         style={{
           background: activity.backgroundUrl
             ? `url(${activity.backgroundUrl}) center/cover`
-            : 'linear-gradient(160deg, hsl(var(--primary) / 0.35) 0%, hsl(205 40% 12%) 50%, hsl(var(--accent) / 0.2) 100%)',
+            : ambient === 'light'
+              ? 'radial-gradient(ellipse at 50% 35%, hsl(38 90% 88%) 0%, hsl(28 70% 78%) 35%, hsl(220 30% 70%) 100%)'
+              : ambient === 'dark'
+                ? 'radial-gradient(ellipse at 50% 45%, hsla(40, 80%, 70%, 0.35) 0%, hsl(225 30% 8%) 55%, hsl(225 35% 4%) 100%)'
+                : 'linear-gradient(160deg, hsl(var(--primary) / 0.35) 0%, hsl(205 40% 12%) 50%, hsl(var(--accent) / 0.2) 100%)',
         }}
       />
-      <div className="absolute inset-0 z-[1] bg-foreground/30" />
+      <div
+        className={`absolute inset-0 z-[1] transition-colors duration-[1200ms] ${
+          ambient === 'light' ? 'bg-background/10' : 'bg-foreground/30'
+        }`}
+      />
 
       {/* Top bar */}
       <header
