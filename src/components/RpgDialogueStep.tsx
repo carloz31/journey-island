@@ -23,18 +23,18 @@ const RpgDialogueStep = ({ step, onNext, onBack, isFirst, isLast, resolvedText }
     let i = 0;
     const id = setInterval(() => {
       i++;
-      setDisplayedText(step.text.slice(0, i));
-      if (i >= step.text.length) {
+      setDisplayedText(text.slice(0, i));
+      if (i >= text.length) {
         clearInterval(id);
         setDone(true);
       }
     }, 12);
     return () => clearInterval(id);
-  }, [step.text]);
+  }, [text]);
 
   const handleClick = () => {
     if (!done) {
-      setDisplayedText(step.text);
+      setDisplayedText(text);
       setDone(true);
     } else {
       onNext();
