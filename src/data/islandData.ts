@@ -122,18 +122,5 @@ export const startIsland: IslandData = {
       x: 850,
       y: 350,
     },
-    {
-      id: "exp1",
-      title: "Conoce a Pepe",
-      description:
-        "Pepe será tu compañero durante esta aventura. En esta breve actividad descubrirás cómo te guiará y de qué manera te acompañará en cada isla.",
-      type: "exploration",
-      activityType: "Actividad libre",
-      status: "available",
-      duration: "10 min/día",
-      imageEmoji: "📝",
-      x: 180,
-      y: 180,
-    },
   ],
 };
