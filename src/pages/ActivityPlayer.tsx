@@ -237,7 +237,9 @@ const ActivityPlayer = () => {
                       bg-accent text-accent-foreground hover:brightness-110 active:scale-95
                       disabled:opacity-40 disabled:pointer-events-none"
                   >
-                    {currentStep === totalSteps - 1 ? '✨ Finalizar' : 'Siguiente ▸'}
+                    {currentStep === totalSteps - 1
+                      ? '✨ Finalizar'
+                      : submitLabel ?? 'Siguiente ▸'}
                   </button>
                 </div>
               </div>
